@@ -2,7 +2,7 @@ version: '3'
 
 services:
   api:
-    container_name: "compose-api"
+    container_name: "snippet-operations-container"
     build:
       context: .
       dockerfile: Dockerfile.dev
