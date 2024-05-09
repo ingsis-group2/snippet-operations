@@ -29,10 +29,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
-tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
-    mainClass.set("austral.ingsis.snippetops.SnippetOpsApplication")
-}
-
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs += "-Xjsr305=strict"
