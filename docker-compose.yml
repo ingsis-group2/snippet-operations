@@ -2,12 +2,12 @@ version: '3'
 
 services:
   api:
-    container_name: "snippet-operations-container"
+    container_name: "snippet-runner"
     build:
       context: .
       dockerfile: Dockerfile.dev
     ports:
-      - 8080:8080
+      - "8080:8080"
     env_file:
       - .env
     environment:
@@ -26,9 +26,3 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: compose-db
-    volumes:
-    - pgdata:/var/lib/postgresql/data
-
-volumes:
-  pgdata:
-    external: true
