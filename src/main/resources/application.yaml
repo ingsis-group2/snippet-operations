@@ -3,7 +3,7 @@ spring:
     name: snippet-ops
 
 server:
-  port: 8081
+  port: 8080
 
 okta:
   oauth2:

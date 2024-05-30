@@ -1,5 +1,6 @@
 package austral.ingsis.snippetperms.config
 
+import austral.ingsis.snippetops.config.UserListener
 import org.springframework.security.oauth2.core.OAuth2Error
 import org.springframework.security.oauth2.core.OAuth2TokenValidator
 import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult
@@ -10,6 +11,7 @@ class AudienceValidator (private val audience: String) : OAuth2TokenValidator<Jw
         val error = OAuth2Error("invalid_token", "The required audience is missing", null)
 
         return if (jwt.audience.contains(audience)) {
+            UserListener().listenUser(jwt)
             OAuth2TokenValidatorResult.success()
         } else {
             OAuth2TokenValidatorResult.failure(error)
