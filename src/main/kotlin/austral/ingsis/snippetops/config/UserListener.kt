@@ -18,7 +18,7 @@ class UserListener {
 
     private fun exists(jwt: Jwt): Boolean {
         val userId = jwt.claims["sub"]
-        val url = URL("http://localhost:8081/permission/user/$userId")
+        val url = URL("http://localhost:8081/user/exists/$userId")
         val con: HttpURLConnection = url.openConnection() as HttpURLConnection
         con.requestMethod = "GET"
 
@@ -38,7 +38,7 @@ class UserListener {
     }
 
     private fun create(jwt: Jwt): Boolean {
-        val url = URL("http://localhost:8081/permission/user")
+        val url = URL("http://localhost:8081/user")
         val con: HttpURLConnection = url.openConnection() as HttpURLConnection
         con.requestMethod = "POST"
         con.doOutput = true

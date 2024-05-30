@@ -9,13 +9,7 @@ import org.springframework.web.bind.annotation.ResponseBody
 
 @Controller
 class SnippetController {
-    @GetMapping("/snippets/user")
-    @ResponseBody
-    fun getAllSnippets(): String {
-        return "get my snippets"
-    }
-
-    @GetMapping("/snippets/{id}")
+    @GetMapping("/{id}")
     @ResponseBody
     fun getAllSnippets(
         @PathVariable("id") id: String,
@@ -23,7 +17,7 @@ class SnippetController {
         return "get snippet by userId"
     }
 
-    @PostMapping("/snippets")
+    @PostMapping("")
     @ResponseBody
     fun createSnippet(
         @RequestBody message: String?,
