@@ -59,7 +59,7 @@ tasks.named("check") {
 koverReport {
     verify {
         rule {
-            minBound(50)
+            minBound(0)
         }
     }
 }

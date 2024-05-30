@@ -1,16 +1,15 @@
 package austral.ingsis.snippetops.config
 
 import austral.ingsis.snippetops.dto.UserDTO
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Controller
+import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import java.io.OutputStreamWriter
 
 @Controller
 class UserListener {
-
     fun listenUser(jwt: Jwt) {
         when {
             !this.exists(jwt) -> this.create(jwt)
@@ -64,5 +63,4 @@ class UserListener {
             con.disconnect()
         }
     }
-
 }

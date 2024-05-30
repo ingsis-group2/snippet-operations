@@ -14,7 +14,6 @@ class SnippetService(
     val url: String = "http://localhost:8081/permission",
     val bucketRepository: BucketRepository = SnippetBucketRepository(),
 ) {
-
     fun getSharedAndWrittenByUserId(userId: String): List<SnippetLocation> {
         val url = URL("$url/snippet/all/$userId")
         return getSnippets(url)
