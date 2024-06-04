@@ -34,4 +34,4 @@ jobs:
         with:
           push: true
           tags: ghcr.io/ingsis-group2:${{ steps.short-sha.outputs.sha }}
-                  ghcr.io/ingsis-group2/snippet-operations:latest
+                ghcr.io/ingsis-group2:latest
