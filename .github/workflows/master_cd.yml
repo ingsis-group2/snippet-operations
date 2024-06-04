@@ -34,7 +34,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: ghcr.io/ingsis-group2/snippet-operations-master:${{ steps.short-sha.outputs.sha }}
+          tags: ghcr.io/ingsis-group2/snippet-ops-master:${{ steps.short-sha.outputs.sha }}
           build-args: |
             GITHUB_ACTOR=${{ github.actor }}
             GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
