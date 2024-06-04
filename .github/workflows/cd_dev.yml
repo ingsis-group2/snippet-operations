@@ -9,7 +9,7 @@ on:
       - completed
 
 jobs:
-  push_snippet_runner:
+  push_snippet_operations:
     name: Push snippet-runner image to ghcr.io
     runs-on: ubuntu-latest
     steps:
