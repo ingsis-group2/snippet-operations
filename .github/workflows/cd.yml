@@ -1,10 +1,9 @@
-name: "Continuous Deployment Master"
+name: "Continuous Deployment"
 
 on:
   workflow_run:
     workflows: [ "Java CI with Gradle" ]
-    branches:
-      - master
+    branches: [master,dev]
     types:
       - completed
 
@@ -34,7 +33,5 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: ghcr.io/ingsis-group2:${{ steps.short-sha.outputs.sha }}
-          build-args: |
-            GITHUB_ACTOR=${{ github.actor }}
-            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+          tags: ghcr.io/ingsis-group2/snippet-operations:${{ steps.short-sha.outputs.sha }}
+                  ghcr.io/ingsis-group2/snippet-operations:latest
