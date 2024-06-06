@@ -1,19 +1,38 @@
 package austral.ingsis.snippetops.service
 
+import austral.ingsis.snippetops.dto.SnippetCreate
 import austral.ingsis.snippetops.dto.SnippetLocation
 import austral.ingsis.snippetops.repository.BucketRepository
-import austral.ingsis.snippetops.repository.SnippetBucketRepository
 import com.nimbusds.jose.shaded.gson.Gson
 import com.nimbusds.jose.shaded.gson.reflect.TypeToken
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.web.client.RestTemplate
 import java.net.HttpURLConnection
 import java.net.URL
 
 @Service
 class SnippetService(
-    val url: String = "http://localhost:8081/permission",
-    val bucketRepository: BucketRepository = SnippetBucketRepository(),
+    @Value("\${spring.services.snippet.permissions}") val url: String,
+    @Autowired val bucketRepository: BucketRepository,
+    @Autowired var restTemplate: RestTemplate,
 ) {
+    fun createSnippet(body: SnippetCreate): ResponseEntity<SnippetLocation> {
+        val headers =
+            HttpHeaders().apply {
+                contentType = MediaType.APPLICATION_JSON
+            }
+        val requestEntity = HttpEntity(body, headers)
+        val response = restTemplate.exchange("$url/snippet", HttpMethod.POST, requestEntity, SnippetLocation::class.java)
+        return response
+    }
+
     fun getSharedAndWrittenByUserId(userId: String): List<SnippetLocation> {
         val url = URL("$url/snippet/all/$userId")
         return getSnippets(url)

@@ -2,17 +2,17 @@ package austral.ingsis.snippetops.repository
 
 interface BucketRepository {
     fun get(
-        id: String,
+        key: String,
         container: String,
-    )
+    ): Any?
 
     fun save(
-        id: String,
+        key: String,
         container: String,
-    )
+    ): Any?
 
     fun delete(
-        id: String,
+        key: String,
         container: String,
-    )
+    ): Any?
 }

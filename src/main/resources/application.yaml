@@ -12,6 +12,10 @@ spring:
         temp: use_jdbc_metadata_defaults=false
     hibernate:
       ddl-auto: none
+  services:
+    snippet:
+      permissions: http://snippet-permissions:8081
+
 
 
 server:
