@@ -31,7 +31,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: ghcr.io/ingsis-group2/snippet-operations-master:latest
+          tags: ghcr.io/ingsis-group2/snippet-operations-dev:latest
       - name: Deploy to VM
         uses: appleboy/ssh-action@master
         with:
