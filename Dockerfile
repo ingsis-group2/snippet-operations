@@ -3,4 +3,4 @@ COPY . /home/gradle/src
 WORKDIR /home/gradle/src
 RUN gradle build
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","/home/gradle/src/build/libs/snippet-operations-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java","-jar","/home/gradle/src/build/libs/snippet-ops-0.0.1-SNAPSHOT.jar"]
