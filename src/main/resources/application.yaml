@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: snippet-ops
+  datasource:
+    url:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  jpa:
+    properties:
+      hibernate:
+        temp: use_jdbc_metadata_defaults=false
+    hibernate:
+      ddl-auto: none
+  services:
+    snippet:
+      permissions: http://snippet-permissions:8081
+
+
+
+server:
+  port: 8082
+
+okta:
+  oauth2:
+    issuer: ${AUTH_SERVER_URI}
+    audience: ${AUTH0_AUDIENCE}
+    client-id: ${AUTH_CLIENT_ID}
+    client-secret: ${AUTH_CLIENT_SECRET}
