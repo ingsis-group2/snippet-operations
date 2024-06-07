@@ -31,6 +31,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
+          no-cache: true
           tags: ghcr.io/ingsis-group2/snippet-operations-master:latest
       - name: Deploy to VM
         uses: appleboy/ssh-action@master
