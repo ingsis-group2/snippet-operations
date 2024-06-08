@@ -7,7 +7,6 @@ on:
       - dev
     types:
       - completed
-
 jobs:
   push_snippet_operations:
     name: Push snippet-operations image to ghcr.io
