@@ -28,10 +28,11 @@ class ServerSecurityConfig(
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http.authorizeHttpRequests {
             it
-                .requestMatchers("/").permitAll()
-                .requestMatchers(GET, "/snippet/*").hasAuthority("SCOPE_read:snippet")
-                .requestMatchers(POST, "/snippet").hasAuthority("SCOPE_create:snippet")
-                .anyRequest().authenticated()
+                  .anyRequest().permitAll()
+//                .requestMatchers("/").permitAll()
+//                .requestMatchers(GET, "/snippet/*").hasAuthority("SCOPE_read:snippet")
+//                .requestMatchers(POST, "/snippet").hasAuthority("SCOPE_create:snippet")
+//                .anyRequest().authenticated()
         }
             .oauth2ResourceServer { it.jwt(withDefaults()) }
             .cors {
