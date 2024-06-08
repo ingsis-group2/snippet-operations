@@ -14,7 +14,7 @@ spring:
       ddl-auto: none
   services:
     snippet:
-      permissions: http://snippet-permissions:8081
+      permissions: http://snippet-permissions:8080
 
 
 
