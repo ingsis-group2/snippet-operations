@@ -14,12 +14,7 @@ spring:
       ddl-auto: none
   services:
     snippet:
-      permissions: http://snippet-permissions:8081
-
-
-
-server:
-  port: 8082
+      permissions: http://snippet-permissions:8080
 
 okta:
   oauth2:
