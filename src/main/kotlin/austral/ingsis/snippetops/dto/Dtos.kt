@@ -10,7 +10,12 @@ data class SnippetDTO(
 
 data class SnippetLocation(val id: String, val container: String)
 
-data class SnippetCreate(val writer: String)
+data class SnippetCreate(
+    val writer: String,
+    val name: String,
+    val language: String,
+    val extension: String,
+)
 
 data class SnippetShow(
     val id: String,

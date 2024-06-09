@@ -2,15 +2,23 @@ package austral.ingsis.snippetops.config
 
 import austral.ingsis.snippetops.repository.BucketRepository
 import austral.ingsis.snippetops.repository.SnippetBucketRepository
+import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.web.client.RestTemplate
 
 @Configuration
 class WebConfig {
     @Bean
     fun restTemplate(): RestTemplate {
-        return RestTemplate()
+        return RestTemplateBuilder()
+            .additionalInterceptors(ClientHttpRequestInterceptor { request, body, execution ->
+                println("Request URI: ${request.uri}")
+                println("Request Body: ${String(body)}")
+                execution.execute(request, body)
+            })
+            .build()
     }
 
     @Bean

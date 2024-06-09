@@ -13,6 +13,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 import java.net.HttpURLConnection
 import java.net.URL
@@ -24,15 +25,19 @@ class SnippetService(
     @Autowired var restTemplate: RestTemplate,
 ) {
     fun createSnippet(body: SnippetCreate): ResponseEntity<SnippetLocation> {
-        val headers =
-            HttpHeaders().apply {
-                contentType = MediaType.APPLICATION_JSON
-            }
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.APPLICATION_JSON
+        }
         val requestEntity = HttpEntity(body, headers)
-        val response = restTemplate.exchange("$url/snippet", HttpMethod.POST, requestEntity, SnippetLocation::class.java)
-        return response
+        return try {
+            val response = restTemplate.exchange("$url/snippet", HttpMethod.POST, requestEntity, SnippetLocation::class.java)
+            response
+        } catch (ex: HttpClientErrorException) {
+            // Manejo de errores
+            println("Error response: ${ex.responseBodyAsString}")
+            ResponseEntity.status(ex.statusCode).build()
+        }
     }
-
     fun getSharedAndWrittenByUserId(userId: String): List<SnippetLocation> {
         val url = URL("$url/snippet/all/$userId")
         return getSnippets(url)
