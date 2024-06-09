@@ -4,7 +4,8 @@ import austral.ingsis.snippetops.dto.SnippetCreate
 import austral.ingsis.snippetops.dto.SnippetLocation
 import austral.ingsis.snippetops.service.SnippetService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.*
+import org.springframework.http.ResponseEntity
+import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
