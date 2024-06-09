@@ -25,9 +25,10 @@ class SnippetService(
     @Autowired var restTemplate: RestTemplate,
 ) {
     fun createSnippet(body: SnippetCreate): ResponseEntity<SnippetLocation> {
-        val headers = HttpHeaders().apply {
-            contentType = MediaType.APPLICATION_JSON
-        }
+        val headers =
+            HttpHeaders().apply {
+                contentType = MediaType.APPLICATION_JSON
+            }
         val requestEntity = HttpEntity(body, headers)
         return try {
             val response = restTemplate.exchange("$url/snippet", HttpMethod.POST, requestEntity, SnippetLocation::class.java)
@@ -38,6 +39,7 @@ class SnippetService(
             ResponseEntity.status(ex.statusCode).build()
         }
     }
+
     fun getSharedAndWrittenByUserId(userId: String): List<SnippetLocation> {
         val url = URL("$url/snippet/all/$userId")
         return getSnippets(url)

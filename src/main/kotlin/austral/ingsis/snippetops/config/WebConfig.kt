@@ -13,11 +13,13 @@ class WebConfig {
     @Bean
     fun restTemplate(): RestTemplate {
         return RestTemplateBuilder()
-            .additionalInterceptors(ClientHttpRequestInterceptor { request, body, execution ->
-                println("Request URI: ${request.uri}")
-                println("Request Body: ${String(body)}")
-                execution.execute(request, body)
-            })
+            .additionalInterceptors(
+                ClientHttpRequestInterceptor { request, body, execution ->
+                    println("Request URI: ${request.uri}")
+                    println("Request Body: ${String(body)}")
+                    execution.execute(request, body)
+                },
+            )
             .build()
     }
 
