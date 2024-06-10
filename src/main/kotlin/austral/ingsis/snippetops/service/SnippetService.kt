@@ -23,31 +23,30 @@ class SnippetService(
     @Autowired var restTemplate: RestTemplate,
 ) {
     fun createSnippet(body: SnippetCreate): ResponseEntity<Boolean> {
-        val headers =
-            HttpHeaders().apply {
-                contentType = MediaType.APPLICATION_JSON
-            }
-        val requestEntity = HttpEntity(body, headers)
-        val snippet =
-            try {
-                val response = restTemplate.exchange("$url/snippet", HttpMethod.POST, requestEntity, SnippetPermissionsDTO::class.java)
-                response
-            } catch (ex: HttpClientErrorException) {
-                ResponseEntity.status(ex.statusCode).build()
-            }
-        snippet as SnippetPermissionsDTO
-        val result = bucketRepository.save(snippet.id.toString(), snippet.container, body.content)
-        return if (result.isPresent) {
-            if (result.get() == true) {
-                ResponseEntity(true, HttpStatus.CREATED)
-            } else {
-                ResponseEntity.notFound().build()
+    val headers = HttpHeaders().apply {
+        contentType = MediaType.APPLICATION_JSON
+    }
+    val requestEntity = HttpEntity(body, headers)
+    
+    val snippetResponse: ResponseEntity<SnippetPermissionsDTO> = try {
+        restTemplate.exchange("$url/snippet", HttpMethod.POST, requestEntity, SnippetPermissionsDTO::class.java)
+    } catch (ex: HttpClientErrorException) {
+        return ResponseEntity.status(ex.statusCode).build()
+    }
+    
+    val snippet = snippetResponse.body ?: return ResponseEntity.badRequest().build()
+    
+    val result = bucketRepository.save(snippet.id.toString(), snippet.container, body.content)
+    return if (result.isPresent) {
+        if (result.get() == true) {
+            ResponseEntity(true, HttpStatus.CREATED)
+        } else {
+            ResponseEntity.notFound().build()
             }
         } else {
             ResponseEntity.badRequest().build()
         }
     }
-
     fun getSnippet(id: String): ResponseEntity<Any> {
         val snippet =
             try {
