@@ -15,6 +15,7 @@ data class SnippetCreate(
     val name: String,
     val language: String,
     val extension: String,
+    val content: String,
 )
 
 data class SnippetShow(
