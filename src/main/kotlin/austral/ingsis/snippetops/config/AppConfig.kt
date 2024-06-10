@@ -11,8 +11,8 @@ import org.springframework.web.client.RestTemplate
 
 @Configuration
 class AppConfig {
-
-    @Value("\${spring.services.snippet.bucket}") lateinit var url: String
+    @Value("\${spring.services.snippet.bucket}")
+    lateinit var url: String
 
     @Bean
     fun restTemplate(): RestTemplate {
@@ -28,7 +28,7 @@ class AppConfig {
     }
 
     @Bean
-    fun bucketRepository(): BucketRepository {
-        return SnippetBucketRepository(url)
+    fun bucketRepository(restTemplate: RestTemplate): BucketRepository {
+        return SnippetBucketRepository(url, restTemplate)
     }
 }
