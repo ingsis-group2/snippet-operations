@@ -2,7 +2,7 @@ package austral.ingsis.snippetops.service
 
 import austral.ingsis.snippetops.dto.SnippetCreate
 import austral.ingsis.snippetops.dto.SnippetDTO
-import austral.ingsis.snippetops.dto.SnippetPermissionDTO
+import austral.ingsis.snippetops.dto.SnippetPermissionsDTO
 import austral.ingsis.snippetops.repository.BucketRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -30,12 +30,12 @@ class SnippetService(
         val requestEntity = HttpEntity(body, headers)
         val snippet =
             try {
-                val response = restTemplate.exchange("$url/snippet", HttpMethod.POST, requestEntity, SnippetPermissionDTO::class.java)
+                val response = restTemplate.exchange("$url/snippet", HttpMethod.POST, requestEntity, SnippetPermissionsDTO::class.java)
                 response
             } catch (ex: HttpClientErrorException) {
                 ResponseEntity.status(ex.statusCode).build()
             }
-        snippet as SnippetPermissionDTO
+        snippet as SnippetPermissionsDTO
         val result = bucketRepository.save(snippet.id.toString(), snippet.container, body.content)
         return if (result.isPresent) {
             if (result.get() == true) {
@@ -51,12 +51,12 @@ class SnippetService(
     fun getSnippet(id: String): ResponseEntity<Any> {
         val snippet =
             try {
-                val response = restTemplate.exchange("$url/snippet?id=$id", HttpMethod.GET, null, SnippetPermissionDTO::class.java)
+                val response = restTemplate.exchange("$url/snippet?id=$id", HttpMethod.GET, null, SnippetPermissionsDTO::class.java)
                 response
             } catch (ex: HttpClientErrorException) {
                 ResponseEntity.status(ex.statusCode).build()
             }
-        snippet as SnippetPermissionDTO
+        snippet as SnippetPermissionsDTO
         val content = this.bucketRepository.get(snippet.id.toString(), snippet.container)
         return when {
             content.isPresent ->
@@ -67,7 +67,7 @@ class SnippetService(
     }
 
     private fun snippetDTO(
-        snippet: SnippetPermissionDTO,
+        snippet: SnippetPermissionsDTO,
         content: String,
     ): SnippetDTO {
         return SnippetDTO(
@@ -76,6 +76,7 @@ class SnippetService(
             snippet.name,
             snippet.language,
             snippet.extension,
+            snippet.readers,
             content,
             snippet.creationDate,
             snippet.updateDate,
