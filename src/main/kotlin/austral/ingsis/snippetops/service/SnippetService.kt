@@ -28,14 +28,15 @@ class SnippetService(
                 contentType = MediaType.APPLICATION_JSON
             }
         val requestEntity = HttpEntity(body, headers)
-        val snippet =
+        val snippetResponseEntity =
             try {
-                val response = restTemplate.exchange("$url/snippet", HttpMethod.POST, requestEntity, SnippetPermissionsDTO::class.java)
-                response
+                restTemplate.exchange("$url/snippet", HttpMethod.POST, requestEntity, SnippetPermissionsDTO::class.java)
             } catch (ex: HttpClientErrorException) {
-                ResponseEntity.status(ex.statusCode).build()
+                return ResponseEntity.status(ex.statusCode).build()
             }
-        snippet as SnippetPermissionsDTO
+
+        val snippet = snippetResponseEntity.body ?: return ResponseEntity.badRequest().build()
+
         val result = bucketRepository.save(snippet.id.toString(), snippet.container, body.content)
         return if (result.isPresent) {
             if (result.get() == true) {
