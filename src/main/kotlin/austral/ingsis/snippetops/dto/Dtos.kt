@@ -26,9 +26,16 @@ data class SnippetDTO(
     val updateDate: LocalDateTime?,
 )
 
-data class SnippetLocation(val id: String, val container: String)
+data class SnippetLocation(val id: Long, val container: String)
 
 data class SnippetCreate(
+    val name: String,
+    val language: String,
+    val extension: String,
+    val content: String,
+)
+
+data class SnippetPermissionsCreate(
     val writer: String,
     val name: String,
     val language: String,
