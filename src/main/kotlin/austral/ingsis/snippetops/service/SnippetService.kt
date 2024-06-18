@@ -24,18 +24,22 @@ class SnippetService(
     @Autowired val bucketRepository: BucketRepository,
     @Autowired var restTemplate: RestTemplate,
 ) {
-    fun createSnippet(body: SnippetCreate, userId: String): ResponseEntity<Boolean> {
+    fun createSnippet(
+        body: SnippetCreate,
+        userId: String,
+    ): ResponseEntity<Boolean> {
         val headers =
             HttpHeaders().apply {
                 contentType = MediaType.APPLICATION_JSON
             }
-        val snippetCreate = SnippetPermissionsCreate(
-            userId,
-            body.name,
-            body.language,
-            body.extension,
-            body.content
-        )
+        val snippetCreate =
+            SnippetPermissionsCreate(
+                userId,
+                body.name,
+                body.language,
+                body.extension,
+                body.content,
+            )
         val requestEntity = HttpEntity(snippetCreate, headers)
         try {
             val snippetResponseEntity =
