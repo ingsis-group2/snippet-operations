@@ -1,18 +1,21 @@
 package austral.ingsis.snippetops.repository
 
+import java.util.Optional
+
 interface BucketRepository {
     fun get(
         key: String,
         container: String,
-    ): Any?
+    ): Optional<Any>
 
     fun save(
         key: String,
         container: String,
-    ): Any?
+        content: String,
+    ): Optional<Any>
 
     fun delete(
         key: String,
         container: String,
-    ): Any?
+    ): Optional<Any>
 }

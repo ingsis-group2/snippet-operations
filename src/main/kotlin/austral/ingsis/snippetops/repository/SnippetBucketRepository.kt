@@ -1,49 +1,72 @@
 package austral.ingsis.snippetops.repository
 
-import austral.ingsis.snippetops.dto.SnippetDTO
 import com.nimbusds.jose.shaded.gson.Gson
-import java.net.HttpURLConnection
-import java.net.URL
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.RestTemplate
+import java.util.Optional
 
 class SnippetBucketRepository(
-    val url: String = "http://localhost:8080/",
+    val url: String,
+    val restTemplate: RestTemplate,
 ) : BucketRepository {
     override fun get(
         key: String,
         container: String,
-    ): SnippetDTO? {
-        val url = URL("$url/v1/asset/{$container}/{$key}")
-        val con: HttpURLConnection = url.openConnection() as HttpURLConnection
-        con.requestMethod = "GET"
-
+    ): Optional<Any> {
+        val url = "$url/$container/$key"
         return try {
-            val responseCode = con.responseCode
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                val responseBody = con.inputStream.bufferedReader().use { it.readText() }
+            val response = restTemplate.exchange(url, HttpMethod.GET, null, String::class.java)
+            if (response.statusCode == HttpStatus.OK) {
+                val responseBody = response.body
                 val gson = Gson()
-                gson.fromJson(responseBody, SnippetDTO::class.java)
+                Optional.of(gson.fromJson(responseBody, String::class.java))
             } else {
-                null
+                Optional.empty()
             }
         } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        } finally {
-            con.disconnect()
+            Optional.empty()
         }
     }
 
     override fun save(
-        id: String,
+        key: String,
         container: String,
-    ) {
-        TODO("Not yet implemented")
+        content: String,
+    ): Optional<Any> {
+        val headers =
+            HttpHeaders().apply {
+                contentType = MediaType.APPLICATION_JSON
+            }
+        val requestEntity = HttpEntity(content, headers)
+        return try {
+            val response =
+                restTemplate.exchange(
+                    "$url/$container/$key",
+                    HttpMethod.POST,
+                    requestEntity,
+                    Void::class.java,
+                )
+            Optional.of(response.statusCode == HttpStatus.CREATED)
+        } catch (ex: HttpClientErrorException) {
+            Optional.empty()
+        }
     }
 
     override fun delete(
-        id: String,
+        key: String,
         container: String,
-    ) {
-        TODO("Not yet implemented")
+    ): Optional<Any> {
+        val url = "$url/$container/$key"
+        return try {
+            val response = restTemplate.exchange(url, HttpMethod.DELETE, null, Void::class.java)
+            Optional.of(response.statusCode == HttpStatus.OK)
+        } catch (e: Exception) {
+            Optional.empty()
+        }
     }
 }
