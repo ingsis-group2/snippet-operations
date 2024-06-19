@@ -32,16 +32,10 @@ class SnippetService(
             HttpHeaders().apply {
                 contentType = MediaType.APPLICATION_JSON
             }
-        val snippetCreate =
-            SnippetPermissionsCreate(
-                userId,
-                body.name,
-                body.language,
-                body.extension,
-                body.content,
-            )
-        val requestEntity = HttpEntity(snippetCreate, headers)
         try {
+            this.checkCreateBody(body)
+            val snippetCreate = this.createSnippetForPermissions(body, userId)
+            val requestEntity = HttpEntity(snippetCreate, headers)
             val snippetResponseEntity =
                 try {
                     val response = restTemplate.exchange("$url/snippet", HttpMethod.POST, requestEntity, SnippetPermissionsDTO::class.java)
@@ -52,8 +46,8 @@ class SnippetService(
                 } catch (ex: HttpClientErrorException) {
                     return ResponseEntity.status(ex.statusCode).build()
                 }
-            val snippet = snippetResponseEntity.body ?: return ResponseEntity.badRequest().build()
 
+            val snippet = snippetResponseEntity.body ?: return ResponseEntity.badRequest().build()
             val result = bucketRepository.save(snippet.id.toString(), snippet.container, body.content)
             return if (result.isPresent) {
                 if (result.get() == true) {
@@ -62,7 +56,8 @@ class SnippetService(
                     ResponseEntity.notFound().build()
                 }
             } else {
-                ResponseEntity.badRequest().build()
+                this.deleteSnippet(snippet.id)
+                return ResponseEntity.status(HttpStatus.CONFLICT).build()
             }
         } catch (e: Exception) {
             return ResponseEntity.badRequest().build()
@@ -137,6 +132,27 @@ class SnippetService(
             content,
             snippet.creationDate,
             snippet.updateDate,
+        )
+    }
+
+    private fun checkCreateBody(body: SnippetCreate) {
+        if (
+            body.content.isBlank() || body.name.isBlank() || body.language.isBlank() || body.extension.isBlank()
+        ) {
+            throw NullPointerException()
+        }
+    }
+
+    private fun createSnippetForPermissions(
+        body: SnippetCreate,
+        userId: String,
+    ): SnippetPermissionsCreate {
+        return SnippetPermissionsCreate(
+            userId,
+            body.name,
+            body.language,
+            body.extension,
+            body.content,
         )
     }
 }
