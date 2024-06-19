@@ -1,6 +1,7 @@
 package austral.ingsis.snippetops.controller
 
 import austral.ingsis.snippetops.dto.SnippetCreate
+import austral.ingsis.snippetops.dto.SnippetDTO
 import austral.ingsis.snippetops.service.SnippetService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
@@ -27,7 +28,7 @@ class SnippetController(
     fun createSnippet(
         @RequestBody body: SnippetCreate,
         @AuthenticationPrincipal user: Jwt,
-    ): ResponseEntity<Boolean> {
+    ): ResponseEntity<SnippetDTO> {
         val userId = user.claims["sub"]
         return snippetService.createSnippet(body, userId.toString())
     }
