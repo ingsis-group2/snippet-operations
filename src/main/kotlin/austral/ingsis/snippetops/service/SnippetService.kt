@@ -47,18 +47,21 @@ class SnippetService(
                     return ResponseEntity.status(ex.statusCode).build()
                 }
 
-            val snippet = snippetResponseEntity.body ?: return ResponseEntity.badRequest().build()
-            val result = bucketRepository.save(snippet.id.toString(), snippet.container, body.content)
-            return if (result.isPresent) {
-                if (result.get() == true) {
-                    ResponseEntity(this.snippetDTO(snippet, result as String), HttpStatus.CREATED)
+            if (snippetResponseEntity.body != null) {
+                val snippet = snippetResponseEntity.body as SnippetPermissionsDTO
+                val result = bucketRepository.save(snippet.id.toString(), snippet.container, body.content)
+                return if (result.isPresent) {
+                    if (result.get() == true) {
+                        ResponseEntity(this.snippetDTO(snippet, result as String), HttpStatus.CREATED)
+                    } else {
+                        ResponseEntity.notFound().build()
+                    }
                 } else {
-                    ResponseEntity.notFound().build()
+                    this.deleteSnippet(snippet.id)
+                    return ResponseEntity.status(HttpStatus.CONFLICT).build()
                 }
-            } else {
-                this.deleteSnippet(snippet.id)
-                return ResponseEntity.status(HttpStatus.CONFLICT).build()
             }
+            throw Exception()
         } catch (e: Exception) {
             return ResponseEntity.badRequest().build()
         }
