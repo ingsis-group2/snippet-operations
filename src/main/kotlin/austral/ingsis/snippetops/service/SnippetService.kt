@@ -32,17 +32,11 @@ class SnippetService(
             HttpHeaders().apply {
                 contentType = MediaType.APPLICATION_JSON
             }
-        val snippetCreate =
-            SnippetPermissionsCreate(
-                userId,
-                body.name,
-                body.language,
-                body.extension,
-                body.content,
-            )
-        val requestEntity = HttpEntity(snippetCreate, headers)
         try {
-            val snippetResponseEntity =
+            this.checkCreateBody(body)
+            val snippetCreate = this.createSnippetForPermissions(body, userId)
+            val requestEntity = HttpEntity(snippetCreate, headers)
+            val permissionsResponse =
                 try {
                     val response = restTemplate.exchange("$url/snippet", HttpMethod.POST, requestEntity, SnippetPermissionsDTO::class.java)
                     when {
@@ -52,18 +46,22 @@ class SnippetService(
                 } catch (ex: HttpClientErrorException) {
                     return ResponseEntity.status(ex.statusCode).build()
                 }
-            val snippet = snippetResponseEntity.body ?: return ResponseEntity.badRequest().build()
 
-            val result = bucketRepository.save(snippet.id.toString(), snippet.container, body.content)
-            return if (result.isPresent) {
-                if (result.get() == true) {
-                    ResponseEntity(this.snippetDTO(snippet, result as String), HttpStatus.CREATED)
+            if (permissionsResponse.body != null) {
+                val snippet = permissionsResponse.body as SnippetPermissionsDTO
+                val result = bucketRepository.save(snippet.id.toString(), snippet.container, body.content)
+                return if (result.isPresent) {
+                    if (result.get() == true) {
+                        ResponseEntity(this.snippetDTO(snippet, result as String), HttpStatus.CREATED)
+                    } else {
+                        ResponseEntity.notFound().build()
+                    }
                 } else {
-                    ResponseEntity.notFound().build()
+                    this.deleteSnippet(snippet.id)
+                    return ResponseEntity.status(HttpStatus.CONFLICT).build()
                 }
-            } else {
-                ResponseEntity.badRequest().build()
             }
+            throw Exception()
         } catch (e: Exception) {
             return ResponseEntity.badRequest().build()
         }
@@ -71,7 +69,7 @@ class SnippetService(
 
     fun getSnippet(id: String): ResponseEntity<Any> {
         try {
-            val snippet =
+            val permissionResponse =
                 try {
                     val response = restTemplate.exchange("$url/snippet/$id", HttpMethod.GET, null, SnippetPermissionsDTO::class.java)
                     when (response.statusCode) {
@@ -82,7 +80,7 @@ class SnippetService(
                 } catch (ex: HttpClientErrorException) {
                     ResponseEntity.status(ex.statusCode).build()
                 }
-            snippet as SnippetPermissionsDTO
+            val snippet = permissionResponse.body as SnippetPermissionsDTO
             val content = this.bucketRepository.get(snippet.id.toString(), snippet.container)
             return when {
                 content.isPresent ->
@@ -99,7 +97,7 @@ class SnippetService(
 
     fun deleteSnippet(id: Long): ResponseEntity<Boolean> {
         try {
-            val snippet =
+            val permissionResponse =
                 try {
                     val response = restTemplate.exchange("$url/snippet/$id", HttpMethod.DELETE, null, SnippetPermissionsDTO::class.java)
                     when (response.statusCode) {
@@ -110,7 +108,7 @@ class SnippetService(
                 } catch (ex: HttpClientErrorException) {
                     ResponseEntity.status(ex.statusCode).build()
                 }
-            snippet as SnippetPermissionsDTO
+            val snippet = permissionResponse.body as SnippetPermissionsDTO
             val response = this.bucketRepository.delete(snippet.id.toString(), snippet.container)
             return when {
                 response.isPresent -> ResponseEntity.ok().build()
@@ -137,6 +135,27 @@ class SnippetService(
             content,
             snippet.creationDate,
             snippet.updateDate,
+        )
+    }
+
+    private fun checkCreateBody(body: SnippetCreate) {
+        if (
+            body.content.isBlank() || body.name.isBlank() || body.language.isBlank() || body.extension.isBlank()
+        ) {
+            throw NullPointerException()
+        }
+    }
+
+    private fun createSnippetForPermissions(
+        body: SnippetCreate,
+        userId: String,
+    ): SnippetPermissionsCreate {
+        return SnippetPermissionsCreate(
+            userId,
+            body.name,
+            body.language,
+            body.extension,
+            body.content,
         )
     }
 }
