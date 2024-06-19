@@ -27,7 +27,7 @@ class SnippetService(
     fun createSnippet(
         body: SnippetCreate,
         userId: String,
-    ): ResponseEntity<Boolean> {
+    ): ResponseEntity<SnippetDTO> {
         val headers =
             HttpHeaders().apply {
                 contentType = MediaType.APPLICATION_JSON
@@ -57,7 +57,7 @@ class SnippetService(
             val result = bucketRepository.save(snippet.id.toString(), snippet.container, body.content)
             return if (result.isPresent) {
                 if (result.get() == true) {
-                    ResponseEntity(true, HttpStatus.CREATED)
+                    ResponseEntity(this.snippetDTO(snippet, result as String), HttpStatus.CREATED)
                 } else {
                     ResponseEntity.notFound().build()
                 }
@@ -74,9 +74,9 @@ class SnippetService(
             val snippet =
                 try {
                     val response = restTemplate.exchange("$url/snippet/$id", HttpMethod.GET, null, SnippetPermissionsDTO::class.java)
-                    when {
-                        response.statusCode == HttpStatus.NOT_FOUND -> throw NotFoundException()
-                        response.statusCode == HttpStatus.INTERNAL_SERVER_ERROR -> throw InternalError()
+                    when (response.statusCode) {
+                        HttpStatus.NOT_FOUND -> throw NotFoundException()
+                        HttpStatus.INTERNAL_SERVER_ERROR -> throw InternalError()
                         else -> response
                     }
                 } catch (ex: HttpClientErrorException) {
@@ -102,9 +102,9 @@ class SnippetService(
             val snippet =
                 try {
                     val response = restTemplate.exchange("$url/snippet/$id", HttpMethod.DELETE, null, SnippetPermissionsDTO::class.java)
-                    when {
-                        response.statusCode == HttpStatus.NOT_FOUND -> throw NotFoundException()
-                        response.statusCode == HttpStatus.INTERNAL_SERVER_ERROR -> throw InternalError()
+                    when (response.statusCode) {
+                        HttpStatus.NOT_FOUND -> throw NotFoundException()
+                        HttpStatus.INTERNAL_SERVER_ERROR -> throw InternalError()
                         else -> response
                     }
                 } catch (ex: HttpClientErrorException) {
