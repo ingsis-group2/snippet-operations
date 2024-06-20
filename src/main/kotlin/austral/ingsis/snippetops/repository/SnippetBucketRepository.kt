@@ -68,4 +68,58 @@ class SnippetBucketRepository(
             Optional.empty()
         }
     }
+
+    override fun getUserLintingRules(userId: String): Optional<Map<String, Any>> {
+        val url = "$url/rules/lint/$userId"
+        return try {
+            val response = restTemplate.exchange(url, HttpMethod.GET, null, Map::class.java)
+            return when (response.statusCode) {
+                HttpStatus.OK -> Optional.of(response.body as Map<String, Any>)
+                else -> Optional.empty()
+            }
+        } catch (e: Exception) {
+            Optional.empty()
+        }
+    }
+
+    override fun saveUserLintingRules(
+        userId: String,
+        rules: Map<String, Any>,
+    ): Boolean {
+        val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
+        val requestEntity = HttpEntity(rules, headers)
+        return try {
+            val response = restTemplate.exchange("$url/rules/lint/$userId", HttpMethod.POST, requestEntity, Void::class.java)
+            response.statusCode == HttpStatus.CREATED
+        } catch (ex: HttpClientErrorException) {
+            false
+        }
+    }
+
+    override fun getUserFormattingRules(userId: String): Optional<Map<String, Any>> {
+        val url = "$url/rules/format/$userId"
+        return try {
+            val response = restTemplate.exchange(url, HttpMethod.GET, null, Map::class.java)
+            return when (response.statusCode) {
+                HttpStatus.OK -> Optional.of(response.body as Map<String, Any>)
+                else -> Optional.empty()
+            }
+        } catch (e: Exception) {
+            Optional.empty()
+        }
+    }
+
+    override fun saveUserFormattingRules(
+        userId: String,
+        rules: Map<String, Any>,
+    ): Boolean {
+        val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
+        val requestEntity = HttpEntity(rules, headers)
+        return try {
+            val response = restTemplate.exchange("$url/rules/format/$userId", HttpMethod.POST, requestEntity, Void::class.java)
+            response.statusCode == HttpStatus.CREATED
+        } catch (ex: HttpClientErrorException) {
+            false
+        }
+    }
 }
