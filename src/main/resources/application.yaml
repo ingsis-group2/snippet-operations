@@ -16,7 +16,7 @@ spring:
     snippet:
       permissions: http://snippet-permissions:8080
       runner: http://snippet-runner:8083
-      bucket: http://asset_service:8082/v1/asset
+      bucket: http://asset_service:8080/v1/asset
 
 okta:
   oauth2:
