@@ -60,8 +60,9 @@ class SnippetService(
                     this.deleteSnippet(snippet.id)
                     return ResponseEntity.status(HttpStatus.CONFLICT).build()
                 }
+            } else {
+                throw Exception()
             }
-            throw Exception()
         } catch (e: Exception) {
             return ResponseEntity.badRequest().build()
         }
@@ -80,6 +81,7 @@ class SnippetService(
                 } catch (ex: HttpClientErrorException) {
                     ResponseEntity.status(ex.statusCode).build()
                 }
+            println(permissionResponse.body)
             val snippet = permissionResponse.body as SnippetPermissionsDTO
             val content = this.bucketRepository.get(snippet.id.toString(), snippet.container)
             return when {
