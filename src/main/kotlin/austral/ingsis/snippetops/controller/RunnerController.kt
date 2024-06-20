@@ -11,8 +11,11 @@ import austral.ingsis.snippetops.dto.runner.lint.LintOutputDTO
 import austral.ingsis.snippetops.dto.runner.lint.RunnerLintDTO
 import austral.ingsis.snippetops.service.RunnerService
 import austral.ingsis.snippetops.service.SnippetService
+import austral.ingsis.snippetops.service.UserRuleService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController
 class RunnerController(
     @Autowired val runnerService: RunnerService,
     @Autowired val snippetService: SnippetService,
+    @Autowired val userRuleService: UserRuleService,
 ) {
     @PostMapping("/execute/{id}")
     suspend fun executeSnippet(
@@ -39,19 +43,25 @@ class RunnerController(
     suspend fun formatSnippet(
         @PathVariable id: String,
         @RequestBody body: FormatDTO,
+        @AuthenticationPrincipal user: Jwt,
     ): ResponseEntity<FormatOutputDTO> {
         val snippet = snippetService.getSnippet(id).body ?: throw Exception("Snippet not found")
         val content = snippet.content
-        return runnerService.formatSnippet(RunnerFormatDTO(content, body.version, body.formatRules))
+
+        val rules = userRuleService.getUserFormattingRules(user.claims["sub"].toString())
+        return runnerService.formatSnippet(RunnerFormatDTO(content, body.version, rules))
     }
 
     @PostMapping("/lint/{id}")
     suspend fun lint(
         @PathVariable id: String,
         @RequestBody body: LintDTO,
+        @AuthenticationPrincipal user: Jwt,
     ): ResponseEntity<LintOutputDTO> {
         val snippet = snippetService.getSnippet(id).body ?: throw Exception("Snippet not found")
         val content = snippet.content
-        return runnerService.lintSnippet(RunnerLintDTO(content, body.version, body.lintRules))
+
+        val rules = userRuleService.getUserLintingRules(user.claims["sub"].toString())
+        return runnerService.lintSnippet(RunnerLintDTO(content, body.version, rules))
     }
 }
