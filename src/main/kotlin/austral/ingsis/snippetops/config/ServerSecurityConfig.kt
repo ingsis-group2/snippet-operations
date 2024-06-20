@@ -31,6 +31,10 @@ class ServerSecurityConfig(
                 .requestMatchers("/").permitAll()
                 .requestMatchers(GET, "/snippet/*").hasAuthority("SCOPE_read:snippet")
                 .requestMatchers(POST, "/snippet").hasAuthority("SCOPE_create:snippet")
+                .requestMatchers(GET, "/rules/lint").hasAuthority("SCOPE_read:snippet")
+                .requestMatchers(POST, "/rules/lint").hasAuthority("SCOPE_create:snippet")
+                .requestMatchers(GET, "/rules/format").hasAuthority("SCOPE_read:snippet")
+                .requestMatchers(POST, "/rules/format").hasAuthority("SCOPE_create:snippet")
                 .anyRequest().authenticated()
         }
             .oauth2ResourceServer { it.jwt(withDefaults()) }
