@@ -1,6 +1,5 @@
 package austral.ingsis.snippetops.repository
 
-import com.nimbusds.jose.shaded.gson.Gson
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -21,12 +20,12 @@ class SnippetBucketRepository(
         val url = "$url/$container/$key"
         return try {
             val response = restTemplate.exchange(url, HttpMethod.GET, null, String::class.java)
-            if (response.statusCode == HttpStatus.OK) {
-                val responseBody = response.body
-                val gson = Gson()
-                Optional.of(gson.fromJson(responseBody, String::class.java))
-            } else {
-                Optional.empty()
+            return when (response.statusCode) {
+                HttpStatus.OK -> {
+                    println(response.body)
+                    return response.body?.let { Optional.of(it) }!!
+                }
+                else -> Optional.empty()
             }
         } catch (e: Exception) {
             Optional.empty()

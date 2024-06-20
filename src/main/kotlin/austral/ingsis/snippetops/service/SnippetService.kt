@@ -81,7 +81,6 @@ class SnippetService(
                 } catch (ex: HttpClientErrorException) {
                     ResponseEntity.status(ex.statusCode).build()
                 }
-            println(permissionResponse.body)
             val snippet = permissionResponse.body as SnippetPermissionsDTO
             val content = this.bucketRepository.get(snippet.id.toString(), snippet.container)
             return when {
