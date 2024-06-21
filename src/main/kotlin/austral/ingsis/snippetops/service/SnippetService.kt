@@ -109,6 +109,9 @@ class SnippetService(
                 } catch (ex: HttpClientErrorException) {
                     ResponseEntity.status(ex.statusCode).build()
                 }
+            if (permissionResponse.body == null) {
+                throw NotFoundException()
+            }
             val snippet = permissionResponse.body as SnippetPermissionsDTO
             val response = this.bucketRepository.delete(snippet.id.toString(), snippet.container)
             return when {
