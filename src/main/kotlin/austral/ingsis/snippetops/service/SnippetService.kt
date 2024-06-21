@@ -119,6 +119,8 @@ class SnippetService(
                 response.isPresent -> ResponseEntity.ok().build()
                 else -> throw NotFoundException()
             }
+        } catch (e: NullPointerException) {
+            return ResponseEntity.notFound().build()
         } catch (e: NotFoundException) {
             return ResponseEntity.notFound().build()
         } catch (e: InternalError) {
