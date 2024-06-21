@@ -1,9 +1,6 @@
 package austral.ingsis.snippetops.service
 
-import austral.ingsis.snippetops.dto.SnippetCreate
-import austral.ingsis.snippetops.dto.SnippetDTO
-import austral.ingsis.snippetops.dto.SnippetPermissionsCreate
-import austral.ingsis.snippetops.dto.SnippetPermissionsDTO
+import austral.ingsis.snippetops.dto.*
 import austral.ingsis.snippetops.repository.BucketRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -100,7 +97,7 @@ class SnippetService(
         try {
             val permissionResponse =
                 try {
-                    val response = restTemplate.exchange("$url/snippet/$id", HttpMethod.DELETE, null, SnippetPermissionsDTO::class.java)
+                    val response = restTemplate.exchange("$url/snippet/$id", HttpMethod.DELETE, null, SnippetLocation::class.java)
                     when (response.statusCode) {
                         HttpStatus.NOT_FOUND -> throw NotFoundException()
                         HttpStatus.INTERNAL_SERVER_ERROR -> throw InternalError()
@@ -112,8 +109,8 @@ class SnippetService(
             if (permissionResponse.body == null) {
                 throw NotFoundException()
             }
-            val snippet = permissionResponse.body as SnippetPermissionsDTO
-            val response = this.bucketRepository.delete(snippet.id.toString(), snippet.container)
+            val location = permissionResponse.body as SnippetLocation
+            val response = this.bucketRepository.delete(location.id.toString(), location.container)
             return when {
                 response.isPresent -> ResponseEntity.ok().build()
                 else -> throw NotFoundException()
