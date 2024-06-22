@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController
 class UserRuleController(
     @Autowired private val userRuleService: UserRuleService,
 ) {
+    @CrossOrigin
     @GetMapping("/lint")
     fun getUserLintingRules(
         @AuthenticationPrincipal user: Jwt,
@@ -29,6 +31,7 @@ class UserRuleController(
         }
     }
 
+    @CrossOrigin
     @PostMapping("/lint")
     fun saveUserRules(
         @AuthenticationPrincipal user: Jwt,
@@ -42,6 +45,7 @@ class UserRuleController(
         }
     }
 
+    @CrossOrigin
     @GetMapping("/format")
     fun getUserFormattingRules(
         @AuthenticationPrincipal user: Jwt,
@@ -55,6 +59,7 @@ class UserRuleController(
         }
     }
 
+    @CrossOrigin
     @PostMapping("/format")
     fun saveUserFormattingRules(
         @AuthenticationPrincipal user: Jwt,
