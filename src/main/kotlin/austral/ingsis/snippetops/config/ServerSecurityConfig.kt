@@ -16,7 +16,6 @@ import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.JwtValidators
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.web.cors.CorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
@@ -25,7 +24,6 @@ class ServerSecurityConfig(
     val audience: String,
     @Value("\${okta.oauth2.issuer}")
     val issuer: String,
-    val corsConfigurationSource: CorsConfigurationSource,
 ) {
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
@@ -41,7 +39,7 @@ class ServerSecurityConfig(
                 .anyRequest().authenticated()
         }
             .oauth2ResourceServer { it.jwt(withDefaults()) }
-            .cors { it.configurationSource(corsConfigurationSource) }
+            .cors(withDefaults())
             .csrf {
                 it.disable()
             }
