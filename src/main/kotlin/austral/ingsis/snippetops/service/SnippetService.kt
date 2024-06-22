@@ -37,7 +37,13 @@ class SnippetService(
             this.checkCreateBody(body)
             val snippetCreate = this.createSnippetForPermissions(body, userId)
             val requestEntity = HttpEntity(snippetCreate, headers)
-            val permissionsResponse = restTemplate.exchange("$url/snippet", HttpMethod.POST, requestEntity, SnippetPermissionsDTO::class.java)
+            val permissionsResponse =
+                restTemplate.exchange(
+                    "$url/snippet",
+                    HttpMethod.POST,
+                    requestEntity,
+                    SnippetPermissionsDTO::class.java,
+                )
             if (permissionsResponse.statusCode != HttpStatus.CREATED) throw Exception()
 
             if (permissionsResponse.body != null) {
