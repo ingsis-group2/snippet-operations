@@ -38,9 +38,7 @@ class ServerSecurityConfig(
                 .anyRequest().authenticated()
         }
             .oauth2ResourceServer { it.jwt(withDefaults()) }
-            .cors {
-                it.disable()
-            }
+            .cors(withDefaults())
             .csrf {
                 it.disable()
             }
