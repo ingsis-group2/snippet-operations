@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+@CrossOrigin(origins = ["http://localhost:5173", "*"])
 @RestController
 @RequestMapping("/rules")
 class UserRuleController(
     @Autowired private val userRuleService: UserRuleService,
 ) {
-    @CrossOrigin
     @GetMapping("/lint")
     fun getUserLintingRules(
         @AuthenticationPrincipal user: Jwt,
@@ -31,7 +31,6 @@ class UserRuleController(
         }
     }
 
-    @CrossOrigin
     @PostMapping("/lint")
     fun saveUserRules(
         @AuthenticationPrincipal user: Jwt,
@@ -45,7 +44,6 @@ class UserRuleController(
         }
     }
 
-    @CrossOrigin
     @GetMapping("/format")
     fun getUserFormattingRules(
         @AuthenticationPrincipal user: Jwt,
@@ -59,7 +57,6 @@ class UserRuleController(
         }
     }
 
-    @CrossOrigin
     @PostMapping("/format")
     fun saveUserFormattingRules(
         @AuthenticationPrincipal user: Jwt,

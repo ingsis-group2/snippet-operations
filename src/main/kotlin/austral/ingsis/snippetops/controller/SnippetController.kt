@@ -9,23 +9,16 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.CrossOrigin
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.RestTemplate
 
+@CrossOrigin(origins = ["http://localhost:5173", "*"])
 @Controller
 @RequestMapping("/snippet")
 class SnippetController(
     @Autowired val snippetService: SnippetService,
     @Autowired val restTemplate: RestTemplate,
 ) {
-    @CrossOrigin
     @PostMapping("")
     fun createSnippet(
         @RequestBody body: SnippetCreate,
