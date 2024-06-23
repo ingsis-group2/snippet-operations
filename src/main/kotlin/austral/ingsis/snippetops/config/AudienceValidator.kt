@@ -1,4 +1,4 @@
-package austral.ingsis.snippetperms.config
+package austral.ingsis.snippetops.config
 
 import org.springframework.security.oauth2.core.OAuth2Error
 import org.springframework.security.oauth2.core.OAuth2TokenValidator
