@@ -21,7 +21,7 @@ import org.springframework.web.client.RestTemplate
 
 @RestController
 @RequestMapping("/snippet")
-@CrossOrigin(origins = ["http://localhost:5173", "http://printscript-ui-1:5173"])
+@CrossOrigin("*")
 class SnippetController(
     @Autowired val snippetService: SnippetService,
     @Autowired val restTemplate: RestTemplate,
