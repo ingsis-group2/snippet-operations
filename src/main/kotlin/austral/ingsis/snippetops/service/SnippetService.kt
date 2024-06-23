@@ -2,6 +2,7 @@ package austral.ingsis.snippetops.service
 
 import austral.ingsis.snippetops.dto.SnippetCreate
 import austral.ingsis.snippetops.dto.SnippetDTO
+import austral.ingsis.snippetops.dto.SnippetLocation
 import austral.ingsis.snippetops.dto.SnippetPermissionsCreate
 import austral.ingsis.snippetops.dto.SnippetPermissionsDTO
 import austral.ingsis.snippetops.repository.BucketRepository
@@ -37,22 +38,20 @@ class SnippetService(
             val snippetCreate = this.createSnippetForPermissions(body, userId)
             val requestEntity = HttpEntity(snippetCreate, headers)
             val permissionsResponse =
-                try {
-                    val response = restTemplate.exchange("$url/snippet", HttpMethod.POST, requestEntity, SnippetPermissionsDTO::class.java)
-                    when {
-                        response.statusCode == HttpStatus.CREATED -> response
-                        else -> throw Exception()
-                    }
-                } catch (ex: HttpClientErrorException) {
-                    return ResponseEntity.status(ex.statusCode).build()
-                }
+                restTemplate.exchange(
+                    "$url/snippet",
+                    HttpMethod.POST,
+                    requestEntity,
+                    SnippetPermissionsDTO::class.java,
+                )
+            if (permissionsResponse.statusCode != HttpStatus.CREATED) throw Exception()
 
             if (permissionsResponse.body != null) {
                 val snippet = permissionsResponse.body as SnippetPermissionsDTO
                 val result = bucketRepository.save(snippet.id.toString(), snippet.container, body.content)
-                return if (result.isPresent) {
-                    if (result.get() == true) {
-                        ResponseEntity(this.snippetDTO(snippet, result as String), HttpStatus.CREATED)
+                if (result.isPresent) {
+                    return if (result.get() == true) {
+                        ResponseEntity(this.snippetDTO(snippet, result.toString()), HttpStatus.CREATED)
                     } else {
                         ResponseEntity.notFound().build()
                     }
@@ -63,6 +62,8 @@ class SnippetService(
             } else {
                 throw Exception()
             }
+        } catch (ex: HttpClientErrorException) {
+            return ResponseEntity.status(ex.statusCode).build()
         } catch (e: Exception) {
             return ResponseEntity.badRequest().build()
         }
@@ -100,7 +101,7 @@ class SnippetService(
         try {
             val permissionResponse =
                 try {
-                    val response = restTemplate.exchange("$url/snippet/$id", HttpMethod.DELETE, null, SnippetPermissionsDTO::class.java)
+                    val response = restTemplate.exchange("$url/snippet/$id", HttpMethod.DELETE, null, SnippetLocation::class.java)
                     when (response.statusCode) {
                         HttpStatus.NOT_FOUND -> throw NotFoundException()
                         HttpStatus.INTERNAL_SERVER_ERROR -> throw InternalError()
@@ -109,12 +110,17 @@ class SnippetService(
                 } catch (ex: HttpClientErrorException) {
                     ResponseEntity.status(ex.statusCode).build()
                 }
-            val snippet = permissionResponse.body as SnippetPermissionsDTO
-            val response = this.bucketRepository.delete(snippet.id.toString(), snippet.container)
+            if (permissionResponse.body == null) {
+                throw NotFoundException()
+            }
+            val location = permissionResponse.body as SnippetLocation
+            val response = this.bucketRepository.delete(location.id.toString(), location.container)
             return when {
                 response.isPresent -> ResponseEntity.ok().build()
                 else -> throw NotFoundException()
             }
+        } catch (e: NullPointerException) {
+            return ResponseEntity.notFound().build()
         } catch (e: NotFoundException) {
             return ResponseEntity.notFound().build()
         } catch (e: InternalError) {
