@@ -38,22 +38,20 @@ class SnippetService(
             val snippetCreate = this.createSnippetForPermissions(body, userId)
             val requestEntity = HttpEntity(snippetCreate, headers)
             val permissionsResponse =
-                try {
-                    val response = restTemplate.exchange("$url/snippet", HttpMethod.POST, requestEntity, SnippetPermissionsDTO::class.java)
-                    when {
-                        response.statusCode == HttpStatus.CREATED -> response
-                        else -> throw Exception()
-                    }
-                } catch (ex: HttpClientErrorException) {
-                    return ResponseEntity.status(ex.statusCode).build()
-                }
+                restTemplate.exchange(
+                    "$url/snippet",
+                    HttpMethod.POST,
+                    requestEntity,
+                    SnippetPermissionsDTO::class.java,
+                )
+            if (permissionsResponse.statusCode != HttpStatus.CREATED) throw Exception()
 
             if (permissionsResponse.body != null) {
                 val snippet = permissionsResponse.body as SnippetPermissionsDTO
                 val result = bucketRepository.save(snippet.id.toString(), snippet.container, body.content)
-                return if (result.isPresent) {
-                    if (result.get() == true) {
-                        ResponseEntity(this.snippetDTO(snippet, result as String), HttpStatus.CREATED)
+                if (result.isPresent) {
+                    return if (result.get() == true) {
+                        ResponseEntity(this.snippetDTO(snippet, result.toString()), HttpStatus.CREATED)
                     } else {
                         ResponseEntity.notFound().build()
                     }
@@ -64,12 +62,14 @@ class SnippetService(
             } else {
                 throw Exception()
             }
+        } catch (ex: HttpClientErrorException) {
+            return ResponseEntity.status(ex.statusCode).build()
         } catch (e: Exception) {
             return ResponseEntity.badRequest().build()
         }
     }
 
-    fun getSnippet(id: String): ResponseEntity<Any> {
+    fun getSnippet(id: String): ResponseEntity<SnippetDTO> {
         try {
             val permissionResponse =
                 try {

@@ -3,6 +3,7 @@ package austral.ingsis.snippetops.controller
 import austral.ingsis.snippetops.service.UserRuleService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
+import org.springframework.http.ResponseEntity.ok
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.CrossOrigin
@@ -24,11 +25,7 @@ class UserRuleController(
     ): ResponseEntity<Map<String, Any>> {
         val userId = user.claims["sub"].toString()
         val rules = userRuleService.getUserLintingRules(userId)
-        return if (rules.isPresent) {
-            ResponseEntity.ok(rules.get())
-        } else {
-            ResponseEntity.notFound().build()
-        }
+        return ok(rules)
     }
 
     @PostMapping("/lint")
@@ -50,11 +47,7 @@ class UserRuleController(
     ): ResponseEntity<Map<String, Any>> {
         val userId = user.claims["sub"].toString()
         val rules = userRuleService.getUserFormattingRules(userId)
-        return if (rules.isPresent) {
-            ResponseEntity.ok(rules.get())
-        } else {
-            ResponseEntity.notFound().build()
-        }
+        return ok(rules)
     }
 
     @PostMapping("/format")

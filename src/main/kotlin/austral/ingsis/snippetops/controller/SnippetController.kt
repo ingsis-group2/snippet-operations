@@ -38,7 +38,7 @@ class SnippetController(
     @GetMapping("/{id}")
     fun getSnippetById(
         @PathVariable(value = "id", required = true) id: String,
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<SnippetDTO> {
         return snippetService.getSnippet(id)
     }
 
