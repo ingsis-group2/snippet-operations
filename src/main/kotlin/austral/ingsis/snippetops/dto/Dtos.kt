@@ -57,7 +57,7 @@ data class SnippetShow(
 data class SnippetGetForm(
     val userId: String,
     val page: Int,
-    val size: Int
+    val size: Int,
 )
 
 data class SnippetUpdate(val id: Int, val content: String)

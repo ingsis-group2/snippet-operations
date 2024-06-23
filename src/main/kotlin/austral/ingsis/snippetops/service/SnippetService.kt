@@ -1,6 +1,10 @@
 package austral.ingsis.snippetops.service
 
-import austral.ingsis.snippetops.dto.*
+import austral.ingsis.snippetops.dto.SnippetCreate
+import austral.ingsis.snippetops.dto.SnippetDTO
+import austral.ingsis.snippetops.dto.SnippetLocation
+import austral.ingsis.snippetops.dto.SnippetPermissionsCreate
+import austral.ingsis.snippetops.dto.SnippetPermissionsDTO
 import austral.ingsis.snippetops.repository.BucketRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -95,13 +99,16 @@ class SnippetService(
         }
     }
 
-    fun getSnippetByWriter(userId: String, page: Int): ResponseEntity<List<SnippetDTO>> {
+    fun getSnippetByWriter(
+        userId: String,
+        page: Int,
+    ): ResponseEntity<List<SnippetDTO>> {
         try {
             val responseType = object : ParameterizedTypeReference<Page<SnippetPermissionsDTO>>() {}
             val response = restTemplate.exchange("$url/snippet/byWriter/$userId/$page/5", HttpMethod.GET, null, responseType)
             if (response.body != null) {
                 val responseBody = response.body
-                return when(response.statusCode) {
+                return when (response.statusCode) {
                     HttpStatus.OK -> ResponseEntity.ok(this.mapPageIntoList(responseBody))
                     HttpStatus.BAD_REQUEST -> ResponseEntity.badRequest().build()
                     else -> ResponseEntity.notFound().build()
@@ -114,13 +121,16 @@ class SnippetService(
         }
     }
 
-    fun getSnippetByReader(userId: String, page: Int): ResponseEntity<List<SnippetDTO>> {
+    fun getSnippetByReader(
+        userId: String,
+        page: Int,
+    ): ResponseEntity<List<SnippetDTO>> {
         try {
             val responseType = object : ParameterizedTypeReference<Page<SnippetPermissionsDTO>>() {}
             val response = restTemplate.exchange("$url/snippet/byReader/$userId/$page/5", HttpMethod.GET, null, responseType)
             if (response.body != null) {
                 val responseBody = response.body
-                return when(response.statusCode) {
+                return when (response.statusCode) {
                     HttpStatus.OK -> ResponseEntity.ok(this.mapPageIntoList(responseBody))
                     HttpStatus.BAD_REQUEST -> ResponseEntity.badRequest().build()
                     else -> ResponseEntity.notFound().build()
@@ -133,13 +143,16 @@ class SnippetService(
         }
     }
 
-    fun getSnippetByReaderAndWriter(userId: String, page: Int): ResponseEntity<List<SnippetDTO>> {
+    fun getSnippetByReaderAndWriter(
+        userId: String,
+        page: Int,
+    ): ResponseEntity<List<SnippetDTO>> {
         try {
             val responseType = object : ParameterizedTypeReference<Page<SnippetPermissionsDTO>>() {}
             val response = restTemplate.exchange("$url/snippet/byReaderAndWriter/$userId/$page/5", HttpMethod.GET, null, responseType)
             if (response.body != null) {
                 val responseBody = response.body
-                return when(response.statusCode) {
+                return when (response.statusCode) {
                     HttpStatus.OK -> ResponseEntity.ok(this.mapPageIntoList(responseBody))
                     HttpStatus.BAD_REQUEST -> ResponseEntity.badRequest().build()
                     else -> ResponseEntity.notFound().build()
