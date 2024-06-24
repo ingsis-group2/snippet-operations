@@ -19,9 +19,11 @@ import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@RequestMapping("/runner")
 class RunnerController(
     @Autowired val runnerService: RunnerService,
     @Autowired val snippetService: SnippetService,
@@ -61,5 +63,22 @@ class RunnerController(
 
         val rules = userRuleService.getUserLintingRules(user.claims["sub"].toString())
         return runnerService.lintSnippet(RunnerLintDTO(content, body.version, rules))
+    }
+
+    @PostMapping("/test/{id}")
+    suspend fun test(
+        @PathVariable id: String,
+        @RequestBody version: String,
+        @AuthenticationPrincipal user: Jwt,
+    ): ResponseEntity<Boolean> {
+        // looks for test number {id}
+        // val testCase = snippetService.getTestCase(id).body ?: throw Exception("Test not found")
+        // looks for the snippet from the test
+        // val snippet = snippetService.getSnippet(testCase.snippetId).body ?: throw Exception("Snippet not found")
+
+//        return runnerService.executeTestCase(
+//            RunnerTestCaseDTO(snippet.content, version, testCase.inputs, testCase.envs, testCase.expectedOutput),
+//        )
+        return ResponseEntity.ok(true)
     }
 }

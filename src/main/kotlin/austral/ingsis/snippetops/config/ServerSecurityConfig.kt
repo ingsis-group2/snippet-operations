@@ -35,16 +35,13 @@ class ServerSecurityConfig(
                 .requestMatchers("/").permitAll()
                 .requestMatchers(GET, "/snippet/*").hasAuthority("SCOPE_read:snippet")
                 .requestMatchers(POST, "/snippet").hasAuthority("SCOPE_create:snippet")
-                .requestMatchers(GET, "/rules/lint").hasAuthority("SCOPE_read:snippet")
-                .requestMatchers(POST, "/rules/lint").hasAuthority("SCOPE_create:snippet")
-                .requestMatchers(GET, "/rules/format").hasAuthority("SCOPE_read:snippet")
-                .requestMatchers(POST, "/rules/format").hasAuthority("SCOPE_create:snippet")
+                .requestMatchers(GET, "/rules/*").hasAuthority("SCOPE_read:snippet")
+                .requestMatchers(POST, "/rules/*").hasAuthority("SCOPE_create:snippet")
+                .requestMatchers(POST, "/runner/*").hasAuthority("SCOPE_execute:snippet")
                 .anyRequest().authenticated()
         }
             .oauth2ResourceServer { it.jwt(withDefaults()) }
-            .cors {
-                it.disable()
-            }
+            .cors { it.configurationSource(corsConfigurationSource()) }
             .csrf {
                 it.disable()
             }
@@ -65,7 +62,7 @@ class ServerSecurityConfig(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val config =
             CorsConfiguration().apply {
-                allowCredentials = false
+                allowCredentials = true
                 addAllowedOrigin("*")
                 addAllowedOriginPattern("*")
                 addAllowedHeader("*")

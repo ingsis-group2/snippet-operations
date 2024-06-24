@@ -6,6 +6,7 @@ import austral.ingsis.snippetops.dto.runner.format.FormatOutputDTO
 import austral.ingsis.snippetops.dto.runner.format.RunnerFormatDTO
 import austral.ingsis.snippetops.dto.runner.lint.LintOutputDTO
 import austral.ingsis.snippetops.dto.runner.lint.RunnerLintDTO
+import austral.ingsis.snippetops.dto.runner.test.RunnerTestDTO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
@@ -27,5 +28,9 @@ class RunnerService(
 
     fun lintSnippet(dto: RunnerLintDTO): ResponseEntity<LintOutputDTO> {
         return restTemplate.postForEntity("$url/lint", dto, LintOutputDTO::class.java)
+    }
+
+    fun executeTestCase(dto: RunnerTestDTO): ResponseEntity<ExecutionOutputDTO> {
+        return restTemplate.postForEntity("$url/test", dto, ExecutionOutputDTO::class.java)
     }
 }
