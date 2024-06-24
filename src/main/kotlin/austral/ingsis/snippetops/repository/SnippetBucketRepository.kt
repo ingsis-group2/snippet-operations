@@ -1,5 +1,6 @@
 package austral.ingsis.snippetops.repository
 
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -13,6 +14,8 @@ class SnippetBucketRepository(
     val url: String,
     val restTemplate: RestTemplate,
 ) : BucketRepository {
+    private val logger = LoggerFactory.getLogger(SnippetBucketRepository::class.java)
+
     override fun get(
         key: String,
         container: String,
@@ -73,11 +76,12 @@ class SnippetBucketRepository(
         val url = "$url/rules/lint/$userId"
         return try {
             val response = restTemplate.exchange(url, HttpMethod.GET, null, Map::class.java)
-            return when (response.statusCode) {
+            when (response.statusCode) {
                 HttpStatus.OK -> Optional.of(response.body as Map<String, Any>)
                 else -> Optional.empty()
             }
         } catch (e: Exception) {
+            logger.error("Error getting linting rules from $url", e)
             Optional.empty()
         }
     }
@@ -92,6 +96,7 @@ class SnippetBucketRepository(
             val response = restTemplate.exchange("$url/rules/lint/$userId", HttpMethod.POST, requestEntity, Void::class.java)
             response.statusCode == HttpStatus.CREATED
         } catch (ex: HttpClientErrorException) {
+            logger.error("Error saving linting rules to $url", ex)
             false
         }
     }
@@ -100,11 +105,12 @@ class SnippetBucketRepository(
         val url = "$url/rules/format/$userId"
         return try {
             val response = restTemplate.exchange(url, HttpMethod.GET, null, Map::class.java)
-            return when (response.statusCode) {
+            when (response.statusCode) {
                 HttpStatus.OK -> Optional.of(response.body as Map<String, Any>)
                 else -> Optional.empty()
             }
         } catch (e: Exception) {
+            logger.error("Error getting formatting rules from $url", e)
             Optional.empty()
         }
     }
@@ -119,6 +125,7 @@ class SnippetBucketRepository(
             val response = restTemplate.exchange("$url/rules/format/$userId", HttpMethod.POST, requestEntity, Void::class.java)
             response.statusCode == HttpStatus.CREATED
         } catch (ex: HttpClientErrorException) {
+            logger.error("Error saving formatting rules to $url", ex)
             false
         }
     }
