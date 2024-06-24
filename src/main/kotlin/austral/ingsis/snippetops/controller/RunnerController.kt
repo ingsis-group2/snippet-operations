@@ -48,7 +48,7 @@ class RunnerController(
         val snippet = snippetService.getSnippet(id).body ?: throw Exception("Snippet not found")
         val content = snippet.content
 
-        val rules = userRuleService.getUserFormattingRules(user.claims["sub"].toString())
+        val rules = userRuleService.getUserRules(user.claims["sub"].toString(), "format")
         return runnerService.formatSnippet(RunnerFormatDTO(content, body.version, rules))
     }
 
@@ -61,7 +61,7 @@ class RunnerController(
         val snippet = snippetService.getSnippet(id).body ?: throw Exception("Snippet not found")
         val content = snippet.content
 
-        val rules = userRuleService.getUserLintingRules(user.claims["sub"].toString())
+        val rules = userRuleService.getUserRules(user.claims["sub"].toString(), "lint")
         return runnerService.lintSnippet(RunnerLintDTO(content, body.version, rules))
     }
 
