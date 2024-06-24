@@ -3,9 +3,9 @@ package austral.ingsis.snippetops.controller
 import austral.ingsis.snippetops.service.UserRuleService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
+import org.springframework.http.ResponseEntity.ok
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
-import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/rules")
-@CrossOrigin(origins = ["http://localhost:5173", "http://printscript-ui-1:5173"])
 class UserRuleController(
     @Autowired private val userRuleService: UserRuleService,
 ) {
@@ -23,12 +22,8 @@ class UserRuleController(
         @AuthenticationPrincipal user: Jwt,
     ): ResponseEntity<Map<String, Any>> {
         val userId = user.claims["sub"].toString()
-        val rules = userRuleService.getUserLintingRules(userId)
-        return if (rules.isPresent) {
-            ResponseEntity.ok(rules.get())
-        } else {
-            ResponseEntity.notFound().build()
-        }
+        val rules = userRuleService.getUserRules(userId, "lint")
+        return ok(rules)
     }
 
     @PostMapping("/lint")
@@ -37,7 +32,7 @@ class UserRuleController(
         @RequestBody rules: Map<String, Any>,
     ): ResponseEntity<Void> {
         val userId = user.claims["sub"].toString()
-        return if (userRuleService.saveUserLintingRules(userId, rules)) {
+        return if (userRuleService.saveUserRules(userId, rules, "lint")) {
             ResponseEntity.status(201).build()
         } else {
             ResponseEntity.status(500).build()
@@ -49,12 +44,8 @@ class UserRuleController(
         @AuthenticationPrincipal user: Jwt,
     ): ResponseEntity<Map<String, Any>> {
         val userId = user.claims["sub"].toString()
-        val rules = userRuleService.getUserFormattingRules(userId)
-        return if (rules.isPresent) {
-            ResponseEntity.ok(rules.get())
-        } else {
-            ResponseEntity.notFound().build()
-        }
+        val rules = userRuleService.getUserRules(userId, "format")
+        return ok(rules)
     }
 
     @PostMapping("/format")
@@ -63,7 +54,7 @@ class UserRuleController(
         @RequestBody rules: Map<String, Any>,
     ): ResponseEntity<Void> {
         val userId = user.claims["sub"].toString()
-        return if (userRuleService.saveUserFormattingRules(userId, rules)) {
+        return if (userRuleService.saveUserRules(userId, rules, "format")) {
             ResponseEntity.status(201).build()
         } else {
             ResponseEntity.status(500).build()

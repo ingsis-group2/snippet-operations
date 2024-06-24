@@ -69,7 +69,7 @@ class SnippetService(
         }
     }
 
-    fun getSnippet(id: String): ResponseEntity<Any> {
+    fun getSnippet(id: String): ResponseEntity<SnippetDTO> {
         try {
             val permissionResponse =
                 try {

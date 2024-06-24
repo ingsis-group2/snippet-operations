@@ -1,5 +1,6 @@
 package austral.ingsis.snippetops.repository
 
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -13,6 +14,8 @@ class SnippetBucketRepository(
     val url: String,
     val restTemplate: RestTemplate,
 ) : BucketRepository {
+    private val logger = LoggerFactory.getLogger(SnippetBucketRepository::class.java)
+
     override fun get(
         key: String,
         container: String,
@@ -69,57 +72,47 @@ class SnippetBucketRepository(
         }
     }
 
-    override fun getUserLintingRules(userId: String): Optional<Map<String, Any>> {
-        val url = "$url/rules/lint/$userId"
+    override fun getUserRules(
+        userId: String,
+        container: String,
+    ): Optional<Map<String, Any>> {
+        val url = "$url/rules/$container/$userId"
         return try {
             val response = restTemplate.exchange(url, HttpMethod.GET, null, Map::class.java)
-            return when (response.statusCode) {
-                HttpStatus.OK -> Optional.of(response.body as Map<String, Any>)
-                else -> Optional.empty()
+            if (response.statusCode == HttpStatus.OK) {
+                Optional.of(response.body as Map<String, Any>)
+            } else {
+                Optional.empty()
             }
         } catch (e: Exception) {
+            logger.error("Error getting rules from $url", e)
             Optional.empty()
         }
     }
 
-    override fun saveUserLintingRules(
+    override fun saveUserRules(
         userId: String,
+        container: String,
         rules: Map<String, Any>,
-    ): Boolean {
+    ): Optional<Boolean> {
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
         val requestEntity = HttpEntity(rules, headers)
         return try {
-            val response = restTemplate.exchange("$url/rules/lint/$userId", HttpMethod.POST, requestEntity, Void::class.java)
-            response.statusCode == HttpStatus.CREATED
-        } catch (ex: HttpClientErrorException) {
-            false
-        }
-    }
-
-    override fun getUserFormattingRules(userId: String): Optional<Map<String, Any>> {
-        val url = "$url/rules/format/$userId"
-        return try {
-            val response = restTemplate.exchange(url, HttpMethod.GET, null, Map::class.java)
-            return when (response.statusCode) {
-                HttpStatus.OK -> Optional.of(response.body as Map<String, Any>)
-                else -> Optional.empty()
+            val response =
+                restTemplate.exchange(
+                    "$url/rules/$container/$userId",
+                    HttpMethod.POST,
+                    requestEntity,
+                    Void::class.java,
+                )
+            if (response.statusCode == HttpStatus.CREATED) {
+                Optional.of(true)
+            } else {
+                Optional.of(false)
             }
         } catch (e: Exception) {
+            logger.error("Error saving rules to $url", e)
             Optional.empty()
-        }
-    }
-
-    override fun saveUserFormattingRules(
-        userId: String,
-        rules: Map<String, Any>,
-    ): Boolean {
-        val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
-        val requestEntity = HttpEntity(rules, headers)
-        return try {
-            val response = restTemplate.exchange("$url/rules/format/$userId", HttpMethod.POST, requestEntity, Void::class.java)
-            response.statusCode == HttpStatus.CREATED
-        } catch (ex: HttpClientErrorException) {
-            false
         }
     }
 }
