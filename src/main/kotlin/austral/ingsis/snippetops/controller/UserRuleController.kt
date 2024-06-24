@@ -22,7 +22,7 @@ class UserRuleController(
         @AuthenticationPrincipal user: Jwt,
     ): ResponseEntity<Map<String, Any>> {
         val userId = user.claims["sub"].toString()
-        val rules = userRuleService.getUserLintingRules(userId)
+        val rules = userRuleService.getUserRules(userId, "lint")
         return ok(rules)
     }
 
@@ -32,7 +32,7 @@ class UserRuleController(
         @RequestBody rules: Map<String, Any>,
     ): ResponseEntity<Void> {
         val userId = user.claims["sub"].toString()
-        return if (userRuleService.saveUserLintingRules(userId, rules)) {
+        return if (userRuleService.saveUserRules(userId, rules, "lint")) {
             ResponseEntity.status(201).build()
         } else {
             ResponseEntity.status(500).build()
@@ -44,7 +44,7 @@ class UserRuleController(
         @AuthenticationPrincipal user: Jwt,
     ): ResponseEntity<Map<String, Any>> {
         val userId = user.claims["sub"].toString()
-        val rules = userRuleService.getUserFormattingRules(userId)
+        val rules = userRuleService.getUserRules(userId, "format")
         return ok(rules)
     }
 
@@ -54,7 +54,7 @@ class UserRuleController(
         @RequestBody rules: Map<String, Any>,
     ): ResponseEntity<Void> {
         val userId = user.claims["sub"].toString()
-        return if (userRuleService.saveUserFormattingRules(userId, rules)) {
+        return if (userRuleService.saveUserRules(userId, rules, "format")) {
             ResponseEntity.status(201).build()
         } else {
             ResponseEntity.status(500).build()

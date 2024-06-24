@@ -11,54 +11,37 @@ class UserRuleService(
 ) {
     private val logger = LoggerFactory.getLogger(UserRuleService::class.java)
 
-    fun getUserLintingRules(userId: String): Map<String, Any> {
+    fun getUserRules(
+        userId: String,
+        container: String,
+    ): Map<String, Any> {
         return try {
-            val rules = bucketRepository.getUserLintingRules(userId)
+            val rules = bucketRepository.getUserRules(userId, container)
             if (rules.isPresent) {
                 rules.get()
             } else {
-                defaultLintingRules()
+                when (container) {
+                    "lint" -> defaultLintingRules()
+                    "format" -> defaultFormattingRules()
+                    else -> emptyMap()
+                }
             }
         } catch (e: Exception) {
-            logger.error("Error fetching linting rules for user $userId", e)
-            defaultLintingRules()
+            logger.error("Error fetching rules for user $userId", e)
+            emptyMap()
         }
     }
 
-    fun saveUserLintingRules(
+    fun saveUserRules(
         userId: String,
         rules: Map<String, Any>,
+        container: String,
     ): Boolean {
         return try {
-            bucketRepository.saveUserLintingRules(userId, rules)
+            val result = bucketRepository.saveUserRules(userId, container, rules)
+            result.orElse(false)
         } catch (e: Exception) {
-            logger.error("Error saving linting rules for user $userId", e)
-            false
-        }
-    }
-
-    fun getUserFormattingRules(userId: String): Map<String, Any> {
-        return try {
-            val rules = bucketRepository.getUserFormattingRules(userId)
-            if (rules.isPresent) {
-                rules.get()
-            } else {
-                defaultFormattingRules()
-            }
-        } catch (e: Exception) {
-            logger.error("Error fetching formatting rules for user $userId", e)
-            defaultFormattingRules()
-        }
-    }
-
-    fun saveUserFormattingRules(
-        userId: String,
-        rules: Map<String, Any>,
-    ): Boolean {
-        return try {
-            bucketRepository.saveUserFormattingRules(userId, rules)
-        } catch (e: Exception) {
-            logger.error("Error saving formatting rules for user $userId", e)
+            logger.error("Error saving rules for user $userId", e)
             false
         }
     }
