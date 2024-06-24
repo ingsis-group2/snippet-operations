@@ -1,5 +1,6 @@
 package austral.ingsis.snippetops.config
 
+import austral.ingsis.snippetperms.config.AudienceValidator
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -41,7 +42,9 @@ class ServerSecurityConfig(
                 .anyRequest().authenticated()
         }
             .oauth2ResourceServer { it.jwt(withDefaults()) }
-            .cors { it.configurationSource(corsConfigurationSource()) }
+            .cors {
+                it.disable()
+            }
             .csrf {
                 it.disable()
             }
