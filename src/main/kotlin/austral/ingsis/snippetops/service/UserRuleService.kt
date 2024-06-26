@@ -13,31 +13,22 @@ class UserRuleService(
         userId: String,
         container: String,
     ): ResponseEntity<Map<*, *>> {
-        try {
-            val rules = this.bucketRepository.getRules(userId, container)
-            return when {
-                rules.isPresent -> ResponseEntity.ok().body(rules.get() as Map<*, *>)
-                else ->
+        return try {
+            val rules = bucketRepository.getRules(userId, container)
+            if (rules.isPresent) {
+                ResponseEntity.ok().body(rules.get() as Map<*, *>)
+            } else {
+                val defaultRules =
                     if (container == "lint") {
-                        try {
-                            // save default rules and return them
-                            this.bucketRepository.saveRules(userId, container, defaultLintingRules())
-                            ResponseEntity.ok().body(defaultLintingRules())
-                        } catch (e: Exception) {
-                            ResponseEntity.status(500).build()
-                        }
+                        defaultLintingRules()
                     } else {
-                        try {
-                            // save default rules and return them
-                            this.bucketRepository.saveRules(userId, container, defaultFormattingRules())
-                            ResponseEntity.ok().body(defaultFormattingRules())
-                        } catch (e: Exception) {
-                            ResponseEntity.status(500).build()
-                        }
+                        defaultFormattingRules()
                     }
+                bucketRepository.saveRules(userId, container, defaultRules)
+                ResponseEntity.ok().body(defaultRules)
             }
         } catch (e: Exception) {
-            return ResponseEntity.status(500).build()
+            ResponseEntity.status(500).build()
         }
     }
 
