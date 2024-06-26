@@ -13,8 +13,10 @@ class UserRuleService(
         userId: String,
         container: String,
     ): ResponseEntity<Map<*, *>> {
+        // remove the auth0| prefix from the userId to avoid issues with the bucket repository
+        val splicedId = extractAuth0UserId(userId)
         return try {
-            val rules = bucketRepository.getRules(userId, container)
+            val rules = bucketRepository.getRules(splicedId, container)
             if (rules.isPresent) {
                 ResponseEntity.ok().body(rules.get() as Map<*, *>)
             } else {
@@ -24,7 +26,7 @@ class UserRuleService(
                     } else {
                         defaultFormattingRules()
                     }
-                bucketRepository.saveRules(userId, container, defaultRules)
+                bucketRepository.saveRules(splicedId, container, defaultRules)
                 ResponseEntity.ok().body(defaultRules)
             }
         } catch (e: Exception) {
@@ -37,8 +39,9 @@ class UserRuleService(
         content: Map<String, Any>,
         container: String,
     ): ResponseEntity<Boolean> {
+        val splicedId = extractAuth0UserId(userId)
         return try {
-            val result = this.bucketRepository.saveRules(userId, container, content)
+            val result = this.bucketRepository.saveRules(splicedId, container, content)
             if (result.isPresent) {
                 if (result.get() == true) {
                     ResponseEntity.status(201).build()
@@ -68,5 +71,9 @@ class UserRuleService(
             "assignationAfter" to true,
             "printJump" to 1,
         )
+    }
+
+    private fun extractAuth0UserId(fullUserId: String): String {
+        return fullUserId.substringAfter("auth0|")
     }
 }
