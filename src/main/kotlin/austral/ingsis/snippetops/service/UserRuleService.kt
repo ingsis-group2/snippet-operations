@@ -32,6 +32,27 @@ class UserRuleService(
         }
     }
 
+    fun saveUserRules(
+        userId: String,
+        content: Map<String, Any>,
+        container: String,
+    ): ResponseEntity<Boolean> {
+        return try {
+            val result = this.bucketRepository.saveRules(userId, container, content)
+            if (result.isPresent) {
+                if (result.get() == true) {
+                    ResponseEntity.status(201).build()
+                } else {
+                    ResponseEntity.status(500).build()
+                }
+            } else {
+                ResponseEntity.status(500).build()
+            }
+        } catch (e: Exception) {
+            ResponseEntity.status(500).build()
+        }
+    }
+
     private fun defaultLintingRules(): Map<String, Any> {
         return mapOf(
             "enablePrintExpressions" to true,
