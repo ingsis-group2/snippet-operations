@@ -31,7 +31,7 @@ class RunnerController(
 ) {
     @PostMapping("/execute/{id}")
     suspend fun executeSnippet(
-        @PathVariable id: String,
+        @PathVariable id: Long,
         @RequestBody body: ExecutionDTO,
     ): ResponseEntity<ExecutionOutputDTO> {
         val snippet = snippetService.getSnippet(id).body ?: throw Exception("Snippet not found")
@@ -41,21 +41,23 @@ class RunnerController(
 
     @PostMapping("/format/{id}")
     suspend fun formatSnippet(
-        @PathVariable id: String,
+        @PathVariable id: Long,
         @RequestBody body: FormatDTO,
         @AuthenticationPrincipal user: Jwt,
     ): ResponseEntity<FormatOutputDTO> {
         val snippet = snippetService.getSnippet(id).body ?: throw Exception("Snippet not found")
         val content = snippet.content
 
+        val userId = user.claims["sub"].toString()
+
         val rules = userRuleService.getUserRules(user.claims["sub"].toString(), "format")
         val unwrappedRules = rules.body ?: throw Exception("Rules not found")
-        return runnerService.formatSnippet(RunnerFormatDTO(content, body.version, unwrappedRules as Map<String, Any>), snippet, id)
+        return runnerService.formatSnippet(RunnerFormatDTO(content, body.version, unwrappedRules as Map<String, Any>), snippet, userId)
     }
 
     @PostMapping("/lint/{id}")
     suspend fun lint(
-        @PathVariable id: String,
+        @PathVariable id: Long,
         @RequestBody body: LintDTO,
         @AuthenticationPrincipal user: Jwt,
     ): ResponseEntity<LintOutputDTO> {
