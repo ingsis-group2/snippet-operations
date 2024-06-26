@@ -60,4 +60,4 @@ data class SnippetGetterForm(
     val size: Int,
 )
 
-data class SnippetUpdate(val id: Int, val content: String)
+data class SnippetUpdateDTO(val content: String)
