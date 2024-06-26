@@ -1,6 +1,5 @@
 package austral.ingsis.snippetops.repository
 
-import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -14,8 +13,6 @@ class SnippetBucketRepository(
     val url: String,
     val restTemplate: RestTemplate,
 ) : BucketRepository {
-    private val logger = LoggerFactory.getLogger(SnippetBucketRepository::class.java)
-
     override fun get(
         key: String,
         container: String,
@@ -72,46 +69,58 @@ class SnippetBucketRepository(
         }
     }
 
-    override fun getUserRules(
-        userId: String,
+    override fun getRules(
+        key: String,
         container: String,
-    ): Optional<Map<String, Any>> {
-        val url = "$url/rules/$container/$userId"
+    ): Optional<Any> {
+        val url = "$url/$container/$key"
         return try {
             val response = restTemplate.exchange(url, HttpMethod.GET, null, Map::class.java)
-            if (response.statusCode == HttpStatus.OK) {
-                Optional.of(response.body as Map<String, Any>)
-            } else {
-                Optional.empty()
+            return when (response.statusCode) {
+                HttpStatus.OK -> {
+                    println(response.body)
+                    return response.body?.let { Optional.of(it) }!!
+                }
+                else -> Optional.empty()
             }
         } catch (e: Exception) {
-            logger.error("Error getting rules from $url", e)
             Optional.empty()
         }
     }
 
-    override fun saveUserRules(
-        userId: String,
+    override fun saveRules(
+        key: String,
         container: String,
-        rules: Map<String, Any>,
-    ): Optional<Boolean> {
-        val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
-        val requestEntity = HttpEntity(rules, headers)
+        content: Map<String, Any>,
+    ): Optional<Any> {
+        val headers =
+            HttpHeaders().apply {
+                contentType = MediaType.APPLICATION_JSON
+            }
+        val requestEntity = HttpEntity(content, headers)
         return try {
             val response =
                 restTemplate.exchange(
-                    "$url/rules/$container/$userId",
+                    "$url/$container/$key",
                     HttpMethod.POST,
                     requestEntity,
                     Void::class.java,
                 )
-            if (response.statusCode == HttpStatus.CREATED) {
-                Optional.of(true)
-            } else {
-                Optional.of(false)
-            }
+            Optional.of(response.statusCode == HttpStatus.CREATED)
+        } catch (ex: HttpClientErrorException) {
+            Optional.empty()
+        }
+    }
+
+    override fun deleteRules(
+        key: String,
+        container: String,
+    ): Optional<Any> {
+        val url = "$url/$container/$key"
+        return try {
+            val response = restTemplate.exchange(url, HttpMethod.DELETE, null, Void::class.java)
+            Optional.of(response.statusCode == HttpStatus.OK)
         } catch (e: Exception) {
-            logger.error("Error saving rules to $url", e)
             Optional.empty()
         }
     }

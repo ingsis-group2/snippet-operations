@@ -19,14 +19,19 @@ interface BucketRepository {
         container: String,
     ): Optional<Any>
 
-    fun getUserRules(
-        userId: String,
+    fun getRules(
+        key: String,
         container: String,
-    ): Optional<Map<String, Any>>
+    ): Optional<Any>
 
-    fun saveUserRules(
-        userId: String,
+    fun saveRules(
+        key: String,
         container: String,
-        rules: Map<String, Any>,
-    ): Optional<Boolean>
+        content: Map<String, Any>,
+    ): Optional<Any>
+
+    fun deleteRules(
+        key: String,
+        container: String,
+    ): Optional<Any>
 }
