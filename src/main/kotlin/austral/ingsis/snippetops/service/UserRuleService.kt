@@ -19,13 +19,25 @@ class UserRuleService(
                 rules.isPresent -> ResponseEntity.ok().body(rules.get() as Map<*, *>)
                 else ->
                     if (container == "lint") {
-                        ResponseEntity.ok().body(defaultLintingRules())
+                        try {
+                            // save default rules and return them
+                            this.bucketRepository.saveRules(userId, container, defaultLintingRules())
+                            ResponseEntity.ok().body(defaultLintingRules())
+                        } catch (e: Exception) {
+                            ResponseEntity.status(500).build()
+                        }
                     } else {
-                        ResponseEntity.ok().body(defaultFormattingRules())
+                        try {
+                            // save default rules and return them
+                            this.bucketRepository.saveRules(userId, container, defaultFormattingRules())
+                            ResponseEntity.ok().body(defaultFormattingRules())
+                        } catch (e: Exception) {
+                            ResponseEntity.status(500).build()
+                        }
                     }
             }
         } catch (e: Exception) {
-            return ResponseEntity.notFound().build()
+            return ResponseEntity.status(500).build()
         }
     }
 
