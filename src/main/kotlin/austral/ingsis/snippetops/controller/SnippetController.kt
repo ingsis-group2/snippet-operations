@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -36,9 +37,19 @@ class SnippetController(
 
     @GetMapping("/{id}")
     fun getSnippetById(
-        @PathVariable(value = "id", required = true) id: String,
+        @PathVariable(value = "id", required = true) id: Long,
     ): ResponseEntity<SnippetDTO> {
         return snippetService.getSnippet(id)
+    }
+
+    @PutMapping("/{id}")
+    fun updateSnippet(
+        @PathVariable id: Long,
+        @RequestBody body: SnippetCreate,
+        @AuthenticationPrincipal user: Jwt,
+    ): ResponseEntity<SnippetDTO> {
+        val userId = user.claims["sub"]
+        return snippetService.updateSnippet(id, body, userId.toString())
     }
 
     @GetMapping("/byWriter")

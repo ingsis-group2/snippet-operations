@@ -72,7 +72,38 @@ class SnippetService(
         }
     }
 
-    fun getSnippet(id: String): ResponseEntity<SnippetDTO> {
+    fun updateSnippet(
+        id: Long,
+        body: SnippetCreate,
+        userId: String,
+    ): ResponseEntity<SnippetDTO> {
+        val headers =
+            HttpHeaders().apply {
+                contentType = MediaType.APPLICATION_JSON
+            }
+        try {
+            // Check if the snippet exists
+            val existingSnippet = this.getSnippet(id)
+            if (existingSnippet.statusCode != HttpStatus.OK) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build()
+            }
+
+            // Delete the existing snippet
+            val deleteResponse = this.deleteSnippet(id)
+            if (deleteResponse.statusCode != HttpStatus.OK) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build()
+            }
+
+            // Create the updated snippet
+            return this.createSnippet(body, userId)
+        } catch (ex: HttpClientErrorException) {
+            return ResponseEntity.status(ex.statusCode).build()
+        } catch (e: Exception) {
+            return ResponseEntity.badRequest().build()
+        }
+    }
+
+    fun getSnippet(id: Long): ResponseEntity<SnippetDTO> {
         try {
             val permissionResponse =
                 try {

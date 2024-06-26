@@ -42,6 +42,7 @@ class SnippetBucketRepository(
                 contentType = MediaType.APPLICATION_JSON
             }
         val requestEntity = HttpEntity(content, headers)
+
         return try {
             val response =
                 restTemplate.exchange(
