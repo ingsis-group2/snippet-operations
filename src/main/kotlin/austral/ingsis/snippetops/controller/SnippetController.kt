@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.client.RestTemplate
@@ -38,6 +39,33 @@ class SnippetController(
         @PathVariable(value = "id", required = true) id: String,
     ): ResponseEntity<SnippetDTO> {
         return snippetService.getSnippet(id)
+    }
+
+    @GetMapping("/byWriter")
+    fun getSnippetsByWriter(
+        @AuthenticationPrincipal user: Jwt,
+        @RequestParam(value = "page", defaultValue = "0") page: Int,
+    ): ResponseEntity<List<SnippetDTO>> {
+        val userId = user.claims["sub"]
+        return this.snippetService.getSnippetByWriter(userId.toString(), page)
+    }
+
+    @GetMapping("/byReader")
+    fun getSnippetsByReader(
+        @AuthenticationPrincipal user: Jwt,
+        @RequestParam(value = "page", defaultValue = "0") page: Int,
+    ): ResponseEntity<List<SnippetDTO>> {
+        val userId = user.claims["sub"]
+        return this.snippetService.getSnippetByReader(userId.toString(), page)
+    }
+
+    @GetMapping("/byReaderAndWriter")
+    fun getSnippetsByReaderAndWriter(
+        @AuthenticationPrincipal user: Jwt,
+        @RequestParam(value = "page", defaultValue = "0") page: Int,
+    ): ResponseEntity<List<SnippetDTO>> {
+        val userId = user.claims["sub"]
+        return this.snippetService.getSnippetByReaderAndWriter(userId.toString(), page)
     }
 
     @DeleteMapping("/{id}")

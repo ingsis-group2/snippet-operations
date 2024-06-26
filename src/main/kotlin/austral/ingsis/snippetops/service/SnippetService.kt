@@ -2,13 +2,16 @@ package austral.ingsis.snippetops.service
 
 import austral.ingsis.snippetops.dto.SnippetCreate
 import austral.ingsis.snippetops.dto.SnippetDTO
+import austral.ingsis.snippetops.dto.SnippetGetterForm
 import austral.ingsis.snippetops.dto.SnippetLocation
 import austral.ingsis.snippetops.dto.SnippetPermissionsCreate
 import austral.ingsis.snippetops.dto.SnippetPermissionsDTO
 import austral.ingsis.snippetops.repository.BucketRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
+import org.springframework.data.domain.Page
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -97,6 +100,99 @@ class SnippetService(
         }
     }
 
+    fun getSnippetByWriter(
+        userId: String,
+        page: Int,
+    ): ResponseEntity<List<SnippetDTO>> {
+        try {
+            val responseType = object : ParameterizedTypeReference<Page<SnippetPermissionsDTO>>() {}
+            val snippetGetterForm = SnippetGetterForm(userId, page, 4)
+            val requestEntity = HttpEntity(snippetGetterForm)
+
+            val response =
+                restTemplate.exchange(
+                    "$url/snippet/byWriter",
+                    HttpMethod.POST,
+                    requestEntity,
+                    responseType,
+                )
+            if (response.body != null) {
+                val responseBody = response.body
+                return when (response.statusCode) {
+                    HttpStatus.OK -> ResponseEntity.ok(this.mapPageIntoList(responseBody))
+                    HttpStatus.BAD_REQUEST -> ResponseEntity.badRequest().build()
+                    else -> ResponseEntity.notFound().build()
+                }
+            } else {
+                throw NullPointerException("Response body from permissions is null")
+            }
+        } catch (e: NullPointerException) {
+            return ResponseEntity(HttpStatus.CONFLICT)
+        }
+    }
+
+    fun getSnippetByReader(
+        userId: String,
+        page: Int,
+    ): ResponseEntity<List<SnippetDTO>> {
+        try {
+            val responseType = object : ParameterizedTypeReference<Page<SnippetPermissionsDTO>>() {}
+            val snippetGetterForm = SnippetGetterForm(userId, page, 4)
+            val requestEntity = HttpEntity(snippetGetterForm)
+
+            val response =
+                restTemplate.exchange(
+                    "$url/snippet/byWriter",
+                    HttpMethod.POST,
+                    requestEntity,
+                    responseType,
+                )
+            if (response.body != null) {
+                val responseBody = response.body
+                return when (response.statusCode) {
+                    HttpStatus.OK -> ResponseEntity.ok(this.mapPageIntoList(responseBody))
+                    HttpStatus.BAD_REQUEST -> ResponseEntity.badRequest().build()
+                    else -> ResponseEntity.notFound().build()
+                }
+            } else {
+                throw NullPointerException("Response body from permissions is null")
+            }
+        } catch (e: NullPointerException) {
+            return ResponseEntity(HttpStatus.CONFLICT)
+        }
+    }
+
+    fun getSnippetByReaderAndWriter(
+        userId: String,
+        page: Int,
+    ): ResponseEntity<List<SnippetDTO>> {
+        try {
+            val responseType = object : ParameterizedTypeReference<Page<SnippetPermissionsDTO>>() {}
+            val snippetGetterForm = SnippetGetterForm(userId, page, 4)
+            val requestEntity = HttpEntity(snippetGetterForm)
+
+            val response =
+                restTemplate.exchange(
+                    "$url/snippet/byWriter",
+                    HttpMethod.POST,
+                    requestEntity,
+                    responseType,
+                )
+            if (response.body != null) {
+                val responseBody = response.body
+                return when (response.statusCode) {
+                    HttpStatus.OK -> ResponseEntity.ok(this.mapPageIntoList(responseBody))
+                    HttpStatus.BAD_REQUEST -> ResponseEntity.badRequest().build()
+                    else -> ResponseEntity.notFound().build()
+                }
+            } else {
+                throw NullPointerException("Response body from permissions is null")
+            }
+        } catch (e: NullPointerException) {
+            return ResponseEntity(HttpStatus.CONFLICT)
+        }
+    }
+
     fun deleteSnippet(id: Long): ResponseEntity<Boolean> {
         try {
             val permissionResponse =
@@ -164,5 +260,14 @@ class SnippetService(
             body.extension,
             body.content,
         )
+    }
+
+    private fun mapPageIntoList(page: Page<SnippetPermissionsDTO>?): List<SnippetDTO> {
+        val snippets = mutableListOf<SnippetDTO>()
+        page?.content?.map { s ->
+            val content = this.bucketRepository.get(s.id.toString(), s.container)
+            snippets.add(this.snippetDTO(s, content.toString()))
+        }
+        return snippets.toList()
     }
 }
