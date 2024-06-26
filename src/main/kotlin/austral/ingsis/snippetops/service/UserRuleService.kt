@@ -13,49 +13,19 @@ class UserRuleService(
         userId: String,
         container: String,
     ): ResponseEntity<Map<*, *>> {
-        try {
-            val rules = this.bucketRepository.getRules(userId, container)
-            return when {
-                rules.isPresent -> ResponseEntity.ok().body(rules.get() as Map<*, *>)
-                else ->
-                    if (container == "lint") {
-                        try {
-                            // save default rules and return them
-                            this.bucketRepository.saveRules(userId, container, defaultLintingRules())
-                            ResponseEntity.ok().body(defaultLintingRules())
-                        } catch (e: Exception) {
-                            ResponseEntity.status(500).build()
-                        }
-                    } else {
-                        try {
-                            // save default rules and return them
-                            this.bucketRepository.saveRules(userId, container, defaultFormattingRules())
-                            ResponseEntity.ok().body(defaultFormattingRules())
-                        } catch (e: Exception) {
-                            ResponseEntity.status(500).build()
-                        }
-                    }
-            }
-        } catch (e: Exception) {
-            return ResponseEntity.status(500).build()
-        }
-    }
-
-    fun saveUserRules(
-        userId: String,
-        content: Map<String, Any>,
-        container: String,
-    ): ResponseEntity<Boolean> {
         return try {
-            val result = this.bucketRepository.saveRules(userId, container, content)
-            if (result.isPresent) {
-                if (result.get() == true) {
-                    ResponseEntity.status(201).build()
-                } else {
-                    ResponseEntity.status(500).build()
-                }
+            val rules = bucketRepository.getRules(userId, container)
+            if (rules.isPresent) {
+                ResponseEntity.ok().body(rules.get() as Map<*, *>)
             } else {
-                ResponseEntity.status(500).build()
+                val defaultRules =
+                    if (container == "lint") {
+                        defaultLintingRules()
+                    } else {
+                        defaultFormattingRules()
+                    }
+                bucketRepository.saveRules(userId, container, defaultRules)
+                ResponseEntity.ok().body(defaultRules)
             }
         } catch (e: Exception) {
             ResponseEntity.status(500).build()
