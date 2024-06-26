@@ -1,48 +1,64 @@
 package austral.ingsis.snippetops.service
 
 import austral.ingsis.snippetops.repository.BucketRepository
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
 @Service
 class UserRuleService(
     @Autowired private val bucketRepository: BucketRepository,
 ) {
-    private val logger = LoggerFactory.getLogger(UserRuleService::class.java)
-
     fun getUserRules(
         userId: String,
         container: String,
-    ): Map<String, Any> {
-        return try {
-            val rules = bucketRepository.getUserRules(userId, container)
-            if (rules.isPresent) {
-                rules.get()
-            } else {
-                when (container) {
-                    "lint" -> defaultLintingRules()
-                    "format" -> defaultFormattingRules()
-                    else -> emptyMap()
-                }
+    ): ResponseEntity<Map<*, *>> {
+        try {
+            val rules = this.bucketRepository.getRules(userId, container)
+            return when {
+                rules.isPresent -> ResponseEntity.ok().body(rules.get() as Map<*, *>)
+                else ->
+                    if (container == "lint") {
+                        try {
+                            // save default rules and return them
+                            this.bucketRepository.saveRules(userId, container, defaultLintingRules())
+                            ResponseEntity.ok().body(defaultLintingRules())
+                        } catch (e: Exception) {
+                            ResponseEntity.status(500).build()
+                        }
+                    } else {
+                        try {
+                            // save default rules and return them
+                            this.bucketRepository.saveRules(userId, container, defaultFormattingRules())
+                            ResponseEntity.ok().body(defaultFormattingRules())
+                        } catch (e: Exception) {
+                            ResponseEntity.status(500).build()
+                        }
+                    }
             }
         } catch (e: Exception) {
-            logger.error("Error fetching rules for user $userId", e)
-            emptyMap()
+            return ResponseEntity.status(500).build()
         }
     }
 
     fun saveUserRules(
         userId: String,
-        rules: Map<String, Any>,
+        content: Map<String, Any>,
         container: String,
-    ): Boolean {
+    ): ResponseEntity<Boolean> {
         return try {
-            val result = bucketRepository.saveUserRules(userId, container, rules)
-            result.orElse(false)
+            val result = this.bucketRepository.saveRules(userId, container, content)
+            if (result.isPresent) {
+                if (result.get() == true) {
+                    ResponseEntity.status(201).build()
+                } else {
+                    ResponseEntity.status(500).build()
+                }
+            } else {
+                ResponseEntity.status(500).build()
+            }
         } catch (e: Exception) {
-            logger.error("Error saving rules for user $userId", e)
-            false
+            ResponseEntity.status(500).build()
         }
     }
 
