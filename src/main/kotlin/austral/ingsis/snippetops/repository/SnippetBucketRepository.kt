@@ -42,6 +42,10 @@ class SnippetBucketRepository(
                 contentType = MediaType.APPLICATION_JSON
             }
         val requestEntity = HttpEntity(content, headers)
+
+        // delete the existing snippet to avoid conflicts
+        delete(key, container)
+
         return try {
             val response =
                 restTemplate.exchange(

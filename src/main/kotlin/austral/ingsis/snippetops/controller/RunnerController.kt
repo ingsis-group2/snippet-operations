@@ -50,7 +50,7 @@ class RunnerController(
 
         val rules = userRuleService.getUserRules(user.claims["sub"].toString(), "format")
         val unwrappedRules = rules.body ?: throw Exception("Rules not found")
-        return runnerService.formatSnippet(RunnerFormatDTO(content, body.version, unwrappedRules as Map<String, Any>))
+        return runnerService.formatSnippet(RunnerFormatDTO(content, body.version, unwrappedRules as Map<String, Any>), snippet, id)
     }
 
     @PostMapping("/lint/{id}")

@@ -1,5 +1,7 @@
 package austral.ingsis.snippetops.service
 
+import austral.ingsis.snippetops.dto.SnippetCreate
+import austral.ingsis.snippetops.dto.SnippetDTO
 import austral.ingsis.snippetops.dto.runner.execute.ExecutionOutputDTO
 import austral.ingsis.snippetops.dto.runner.execute.RunnerExecutionDTO
 import austral.ingsis.snippetops.dto.runner.format.FormatOutputDTO
@@ -17,6 +19,7 @@ import org.springframework.web.client.RestTemplate
 class RunnerService(
     @Value("\${spring.services.snippet.runner}") val url: String,
     @Autowired val restTemplate: RestTemplate,
+    @Autowired val snippetService: SnippetService,
 ) {
     fun executeSnippet(dto: RunnerExecutionDTO): ResponseEntity<ExecutionOutputDTO> {
         return try {
@@ -26,9 +29,21 @@ class RunnerService(
         }
     }
 
-    fun formatSnippet(dto: RunnerFormatDTO): ResponseEntity<FormatOutputDTO> {
+    fun formatSnippet(
+        dto: RunnerFormatDTO,
+        snippet: SnippetDTO,
+        userId: String,
+    ): ResponseEntity<FormatOutputDTO> {
         return try {
-            restTemplate.postForEntity("$url/format", dto, FormatOutputDTO::class.java)
+            // update the snippet content with the formatted content
+            val response = restTemplate.postForEntity("$url/format", dto, FormatOutputDTO::class.java)
+            if (response.statusCode.is2xxSuccessful) {
+                snippetService.createSnippet(
+                    SnippetCreate(snippet.name, snippet.language, snippet.extension, response.body?.formattedCode ?: ""),
+                    userId,
+                )
+            }
+            response
         } catch (e: Exception) {
             ResponseEntity.status(500).body(FormatOutputDTO("", listOf(e.message ?: "Internal server error")))
         }
