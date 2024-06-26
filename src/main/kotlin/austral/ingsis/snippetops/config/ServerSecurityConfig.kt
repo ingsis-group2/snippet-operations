@@ -62,7 +62,7 @@ class ServerSecurityConfig(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val config =
             CorsConfiguration().apply {
-                allowCredentials = true
+                allowCredentials = false
                 addAllowedOrigin("*")
                 addAllowedOriginPattern("*")
                 addAllowedHeader("*")
