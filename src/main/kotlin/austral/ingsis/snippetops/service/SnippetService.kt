@@ -105,7 +105,6 @@ class SnippetService(
         page: Int,
     ): ResponseEntity<List<SnippetDTO>> {
         try {
-            val responseType = object : ParameterizedTypeReference<Page<SnippetPermissionsDTO>>() {}
             val snippetGetterForm = SnippetGetterForm(userId, page, 4)
             val requestEntity = HttpEntity(snippetGetterForm)
 
@@ -114,12 +113,12 @@ class SnippetService(
                     "$url/snippet/byWriter",
                     HttpMethod.POST,
                     requestEntity,
-                    responseType,
+                    object : ParameterizedTypeReference<List<SnippetPermissionsDTO>>() {}
                 )
             if (response.body != null) {
                 val responseBody = response.body
                 return when (response.statusCode) {
-                    HttpStatus.OK -> ResponseEntity.ok(this.mapPageIntoList(responseBody))
+                    HttpStatus.OK -> ResponseEntity(this.mapSnippetsIntoDtos(responseBody), HttpStatus.OK)
                     HttpStatus.BAD_REQUEST -> ResponseEntity.badRequest().build()
                     else -> ResponseEntity.notFound().build()
                 }
@@ -136,7 +135,6 @@ class SnippetService(
         page: Int,
     ): ResponseEntity<List<SnippetDTO>> {
         try {
-            val responseType = object : ParameterizedTypeReference<Page<SnippetPermissionsDTO>>() {}
             val snippetGetterForm = SnippetGetterForm(userId, page, 4)
             val requestEntity = HttpEntity(snippetGetterForm)
 
@@ -145,12 +143,12 @@ class SnippetService(
                     "$url/snippet/byWriter",
                     HttpMethod.POST,
                     requestEntity,
-                    responseType,
+                    object : ParameterizedTypeReference<List<SnippetPermissionsDTO>>() {}
                 )
             if (response.body != null) {
                 val responseBody = response.body
                 return when (response.statusCode) {
-                    HttpStatus.OK -> ResponseEntity.ok(this.mapPageIntoList(responseBody))
+                    HttpStatus.OK -> ResponseEntity(this.mapSnippetsIntoDtos(responseBody), HttpStatus.OK)
                     HttpStatus.BAD_REQUEST -> ResponseEntity.badRequest().build()
                     else -> ResponseEntity.notFound().build()
                 }
@@ -167,7 +165,6 @@ class SnippetService(
         page: Int,
     ): ResponseEntity<List<SnippetDTO>> {
         try {
-            val responseType = object : ParameterizedTypeReference<Page<SnippetPermissionsDTO>>() {}
             val snippetGetterForm = SnippetGetterForm(userId, page, 4)
             val requestEntity = HttpEntity(snippetGetterForm)
 
@@ -176,12 +173,12 @@ class SnippetService(
                     "$url/snippet/byWriter",
                     HttpMethod.POST,
                     requestEntity,
-                    responseType,
+                    object : ParameterizedTypeReference<List<SnippetPermissionsDTO>>() {}
                 )
             if (response.body != null) {
                 val responseBody = response.body
                 return when (response.statusCode) {
-                    HttpStatus.OK -> ResponseEntity.ok(this.mapPageIntoList(responseBody))
+                    HttpStatus.OK -> ResponseEntity(this.mapSnippetsIntoDtos(responseBody), HttpStatus.OK)
                     HttpStatus.BAD_REQUEST -> ResponseEntity.badRequest().build()
                     else -> ResponseEntity.notFound().build()
                 }
@@ -262,12 +259,12 @@ class SnippetService(
         )
     }
 
-    private fun mapPageIntoList(page: Page<SnippetPermissionsDTO>?): List<SnippetDTO> {
-        val snippets = mutableListOf<SnippetDTO>()
-        page?.content?.map { s ->
+    private fun mapSnippetsIntoDtos(snippets: List<SnippetPermissionsDTO>?): List<SnippetDTO> {
+        val dtos = mutableListOf<SnippetDTO>()
+        snippets?.forEach { s ->
             val content = this.bucketRepository.get(s.id.toString(), s.container)
-            snippets.add(this.snippetDTO(s, content.toString()))
+            dtos.add(this.snippetDTO(s, content.toString()))
         }
-        return snippets.toList()
+        return dtos.toList()
     }
 }
