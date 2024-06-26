@@ -73,13 +73,9 @@ class SnippetService(
 
     fun updateSnippet(
         id: Long,
-        body: SnippetCreate,
+        body: String,
         userId: String,
-    ): ResponseEntity<SnippetDTO> {
-        val headers =
-            HttpHeaders().apply {
-                contentType = MediaType.APPLICATION_JSON
-            }
+    ): ResponseEntity<Boolean> {
         try {
             // Check if the snippet exists
             val existingSnippet = this.getSnippet(id)
@@ -87,14 +83,20 @@ class SnippetService(
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build()
             }
 
-            // Delete the existing snippet
-            val deleteResponse = this.deleteSnippet(id)
-            if (deleteResponse.statusCode != HttpStatus.OK) {
+            // Delete the existing snippet from the bucket
+            val snippet = existingSnippet.body
+            val deleteResponse = this.bucketRepository.delete(snippet?.id.toString(), "snippet")
+            if (!deleteResponse.isPresent) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build()
             }
 
-            // Create the updated snippet
-            return this.createSnippet(body, userId)
+            // Put the new snippet in the same place
+            val result = this.bucketRepository.save(snippet?.id.toString(), "snippet", body)
+            if (!result.isPresent) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build()
+            }
+
+            return ResponseEntity.ok().build()
         } catch (ex: HttpClientErrorException) {
             return ResponseEntity.status(ex.statusCode).build()
         } catch (e: Exception) {

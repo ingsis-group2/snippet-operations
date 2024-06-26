@@ -1,6 +1,5 @@
 package austral.ingsis.snippetops.service
 
-import austral.ingsis.snippetops.dto.SnippetCreate
 import austral.ingsis.snippetops.dto.SnippetDTO
 import austral.ingsis.snippetops.dto.runner.execute.ExecutionOutputDTO
 import austral.ingsis.snippetops.dto.runner.execute.RunnerExecutionDTO
@@ -38,8 +37,9 @@ class RunnerService(
             // update the snippet content with the formatted content
             val response = restTemplate.postForEntity("$url/format", dto, FormatOutputDTO::class.java)
             if (response.statusCode.is2xxSuccessful) {
-                snippetService.createSnippet(
-                    SnippetCreate(snippet.name, snippet.language, snippet.extension, response.body?.formattedCode ?: ""),
+                snippetService.updateSnippet(
+                    snippet.id,
+                    response.body?.formattedCode ?: snippet.content,
                     userId,
                 )
             }

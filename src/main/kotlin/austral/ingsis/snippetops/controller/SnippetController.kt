@@ -45,9 +45,9 @@ class SnippetController(
     @PutMapping("/{id}")
     fun updateSnippet(
         @PathVariable id: Long,
-        @RequestBody body: SnippetCreate,
+        @RequestBody body: String,
         @AuthenticationPrincipal user: Jwt,
-    ): ResponseEntity<SnippetDTO> {
+    ): ResponseEntity<Boolean> {
         val userId = user.claims["sub"]
         return snippetService.updateSnippet(id, body, userId.toString())
     }
