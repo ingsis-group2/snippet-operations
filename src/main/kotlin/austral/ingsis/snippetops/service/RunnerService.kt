@@ -19,18 +19,34 @@ class RunnerService(
     @Autowired val restTemplate: RestTemplate,
 ) {
     fun executeSnippet(dto: RunnerExecutionDTO): ResponseEntity<ExecutionOutputDTO> {
-        return restTemplate.postForEntity("$url/execute", dto, ExecutionOutputDTO::class.java)
+        return try {
+            restTemplate.postForEntity("$url/execute", dto, ExecutionOutputDTO::class.java)
+        } catch (e: Exception) {
+            ResponseEntity.status(500).body(ExecutionOutputDTO(emptyList(), listOf(e.message ?: "Internal server error")))
+        }
     }
 
     fun formatSnippet(dto: RunnerFormatDTO): ResponseEntity<FormatOutputDTO> {
-        return restTemplate.postForEntity("$url/format", dto, FormatOutputDTO::class.java)
+        return try {
+            restTemplate.postForEntity("$url/format", dto, FormatOutputDTO::class.java)
+        } catch (e: Exception) {
+            ResponseEntity.status(500).body(FormatOutputDTO("", listOf(e.message ?: "Internal server error")))
+        }
     }
 
     fun lintSnippet(dto: RunnerLintDTO): ResponseEntity<LintOutputDTO> {
-        return restTemplate.postForEntity("$url/lint", dto, LintOutputDTO::class.java)
+        return try {
+            restTemplate.postForEntity("$url/lint", dto, LintOutputDTO::class.java)
+        } catch (e: Exception) {
+            ResponseEntity.status(500).body(LintOutputDTO(emptyList(), listOf(e.message ?: "Internal server error")))
+        }
     }
 
-    fun executeTestCase(dto: RunnerTestDTO): ResponseEntity<ExecutionOutputDTO> {
-        return restTemplate.postForEntity("$url/test", dto, ExecutionOutputDTO::class.java)
+    fun executeTestCase(dto: RunnerTestDTO): ResponseEntity<Boolean> {
+        return try {
+            restTemplate.postForEntity("$url/test", dto, Boolean::class.java)
+        } catch (e: Exception) {
+            ResponseEntity.status(500).body(false)
+        }
     }
 }
