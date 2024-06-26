@@ -2,6 +2,7 @@ package austral.ingsis.snippetops.service
 
 import austral.ingsis.snippetops.dto.SnippetCreate
 import austral.ingsis.snippetops.dto.SnippetDTO
+import austral.ingsis.snippetops.dto.SnippetGetterForm
 import austral.ingsis.snippetops.dto.SnippetLocation
 import austral.ingsis.snippetops.dto.SnippetPermissionsCreate
 import austral.ingsis.snippetops.dto.SnippetPermissionsDTO
@@ -105,7 +106,16 @@ class SnippetService(
     ): ResponseEntity<List<SnippetDTO>> {
         try {
             val responseType = object : ParameterizedTypeReference<Page<SnippetPermissionsDTO>>() {}
-            val response = restTemplate.exchange("$url/snippet/byWriter/$userId/$page/5", HttpMethod.GET, null, responseType)
+            val snippetGetterForm = SnippetGetterForm(userId, page, 4)
+            val requestEntity = HttpEntity(snippetGetterForm)
+
+            val response =
+                restTemplate.exchange(
+                    "$url/snippet/byWriter",
+                    HttpMethod.POST,
+                    requestEntity,
+                    responseType,
+                )
             if (response.body != null) {
                 val responseBody = response.body
                 return when (response.statusCode) {
@@ -127,7 +137,16 @@ class SnippetService(
     ): ResponseEntity<List<SnippetDTO>> {
         try {
             val responseType = object : ParameterizedTypeReference<Page<SnippetPermissionsDTO>>() {}
-            val response = restTemplate.exchange("$url/snippet/byReader/$userId/$page/5", HttpMethod.GET, null, responseType)
+            val snippetGetterForm = SnippetGetterForm(userId, page, 4)
+            val requestEntity = HttpEntity(snippetGetterForm)
+
+            val response =
+                restTemplate.exchange(
+                    "$url/snippet/byWriter",
+                    HttpMethod.POST,
+                    requestEntity,
+                    responseType,
+                )
             if (response.body != null) {
                 val responseBody = response.body
                 return when (response.statusCode) {
@@ -149,7 +168,16 @@ class SnippetService(
     ): ResponseEntity<List<SnippetDTO>> {
         try {
             val responseType = object : ParameterizedTypeReference<Page<SnippetPermissionsDTO>>() {}
-            val response = restTemplate.exchange("$url/snippet/byReaderAndWriter/$userId/$page/5", HttpMethod.GET, null, responseType)
+            val snippetGetterForm = SnippetGetterForm(userId, page, 4)
+            val requestEntity = HttpEntity(snippetGetterForm)
+
+            val response =
+                restTemplate.exchange(
+                    "$url/snippet/byWriter",
+                    HttpMethod.POST,
+                    requestEntity,
+                    responseType,
+                )
             if (response.body != null) {
                 val responseBody = response.body
                 return when (response.statusCode) {
