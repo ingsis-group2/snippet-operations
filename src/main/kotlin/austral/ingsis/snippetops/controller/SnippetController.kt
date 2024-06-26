@@ -35,6 +35,15 @@ class SnippetController(
         return snippetService.createSnippet(body, userId.toString())
     }
 
+    @PostMapping("/addReader")
+    fun addReaderIntoSnippet(
+        @AuthenticationPrincipal user: Jwt,
+        @RequestParam readerMail: String,
+        @RequestParam snippetId: Long,
+    ): ResponseEntity<Boolean> {
+        return this.snippetService.addNewReaderIntoSnippet(user.claims["sub"].toString(), readerMail, snippetId)
+    }
+
     @GetMapping("/{id}")
     fun getSnippetById(
         @PathVariable(value = "id", required = true) id: Long,
@@ -97,5 +106,13 @@ class SnippetController(
         val url = "http://snippet-permissions:8080/snippet/greetBack"
         val response = restTemplate.exchange(url, HttpMethod.GET, null, String::class.java)
         return ResponseEntity(response.body, response.statusCode)
+    }
+
+    @GetMapping("userId/{mail}")
+    @ResponseBody
+    fun getUserIdByMail(
+        @PathVariable("mail") mail: String,
+    ): String {
+        return this.snippetService.getUserIdByEmail(mail)
     }
 }

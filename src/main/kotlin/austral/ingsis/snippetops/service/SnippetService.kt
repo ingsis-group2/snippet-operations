@@ -1,5 +1,6 @@
 package austral.ingsis.snippetops.service
 
+import austral.ingsis.snippetops.dto.NewReaderForm
 import austral.ingsis.snippetops.dto.SnippetCreate
 import austral.ingsis.snippetops.dto.SnippetDTO
 import austral.ingsis.snippetops.dto.SnippetGetterForm
@@ -7,6 +8,7 @@ import austral.ingsis.snippetops.dto.SnippetLocation
 import austral.ingsis.snippetops.dto.SnippetPermissionsCreate
 import austral.ingsis.snippetops.dto.SnippetPermissionsDTO
 import austral.ingsis.snippetops.repository.BucketRepository
+import org.apache.coyote.BadRequestException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.ParameterizedTypeReference
@@ -20,10 +22,12 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
+import java.io.IOException
 
 @Service
 class SnippetService(
     @Value("\${spring.services.snippet.permissions}") val url: String,
+    @Value("\${okta.oauth2.issuer}") val uri: String,
     @Autowired val bucketRepository: BucketRepository,
     @Autowired var restTemplate: RestTemplate,
 ) {
@@ -67,6 +71,31 @@ class SnippetService(
         } catch (ex: HttpClientErrorException) {
             return ResponseEntity.status(ex.statusCode).build()
         } catch (e: Exception) {
+            return ResponseEntity.badRequest().build()
+        }
+    }
+
+    fun addNewReaderIntoSnippet(
+        userId: String,
+        readerMail: String,
+        snippetId: Long,
+    ): ResponseEntity<Boolean> {
+        try {
+            val readerId = this.getUserIdByEmail(readerMail)
+            val requestEntity = HttpEntity(NewReaderForm(snippetId, userId, readerId))
+            val response =
+                restTemplate.exchange(
+                    "$url/snippet/addReader",
+                    HttpMethod.POST,
+                    requestEntity,
+                    Boolean::class.java,
+                )
+            if (response.statusCode == HttpStatus.OK) {
+                return ResponseEntity.ok().build()
+            } else {
+                throw BadRequestException()
+            }
+        } catch (ex: Exception) {
             return ResponseEntity.badRequest().build()
         }
     }
@@ -299,4 +328,14 @@ class SnippetService(
         }
         return dtos.toList()
     }
+
+    fun getUserIdByEmail(email: String): String {
+        val url = uri + "api/v2/users-by-email?email=$email"
+        val response = restTemplate.exchange(url, HttpMethod.GET, null, Array<Auth0User>::class.java)
+        val users = response.body ?: throw IOException("User not found")
+        if (users.isEmpty()) throw IOException("User not found")
+        return users[0].user_id
+    }
 }
+
+data class Auth0User(val user_id: String)
