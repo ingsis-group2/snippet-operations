@@ -60,4 +60,12 @@ data class SnippetGetterForm(
     val size: Int,
 )
 
+data class NewReaderForm(
+    val snippetId: Long,
+    val userId: String,
+    val readerId: String,
+)
+
+data class SnippetUpdate(val id: Int, val content: String)
+
 data class SnippetUpdateDTO(val content: String)
