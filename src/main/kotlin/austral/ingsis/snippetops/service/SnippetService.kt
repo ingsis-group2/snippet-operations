@@ -166,7 +166,7 @@ class SnippetService(
         page: Int,
     ): ResponseEntity<List<SnippetDTO>> {
         try {
-            val snippetGetterForm = SnippetGetterForm(userId, page, 4)
+            val snippetGetterForm = SnippetGetterForm(userId, page, 10)
             val requestEntity = HttpEntity(snippetGetterForm)
 
             val response =
@@ -196,7 +196,7 @@ class SnippetService(
         page: Int,
     ): ResponseEntity<List<SnippetDTO>> {
         try {
-            val snippetGetterForm = SnippetGetterForm(userId, page, 4)
+            val snippetGetterForm = SnippetGetterForm(userId, page, 10)
             val requestEntity = HttpEntity(snippetGetterForm)
 
             val response =
