@@ -113,7 +113,8 @@ class SnippetController(
     @ResponseBody
     fun getUserIdByMail(
         @PathVariable("mail") mail: String,
+        @AuthenticationPrincipal user: Jwt,
     ): String {
-        return this.snippetService.getUserIdByEmail(mail)
+        return this.snippetService.getUserIdByEmail(mail, user.toString())
     }
 }
