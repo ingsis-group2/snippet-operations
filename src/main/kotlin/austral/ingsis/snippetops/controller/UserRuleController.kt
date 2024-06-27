@@ -1,5 +1,6 @@
 package austral.ingsis.snippetops.controller
 
+import austral.ingsis.snippetops.redis.producer.LintRequestProducer
 import austral.ingsis.snippetops.service.UserRuleService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 @CrossOrigin("*")
 class UserRuleController(
     @Autowired private val userRuleService: UserRuleService,
+    @Autowired private val lintProducer: LintRequestProducer,
 ) {
     @GetMapping("/lint")
     fun getUserLintingRules(

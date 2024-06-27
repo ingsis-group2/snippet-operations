@@ -10,3 +10,8 @@ services:
       - "8080:8080"
     env_file:
       - .env
+  redis:
+    container_name: "redis"
+    image: redis:6-alpine
+    ports:
+        - "6379:6379"
