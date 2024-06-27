@@ -81,7 +81,7 @@ class SnippetService(
         snippetId: Long,
     ): ResponseEntity<Boolean> {
         try {
-            val readerId = this.getUserIdByEmail(readerMail)
+            val readerId = this.getUserIdByEmail(readerMail, userId)
             val requestEntity = HttpEntity(NewReaderForm(snippetId, userId, readerId))
             val response =
                 restTemplate.exchange(
@@ -331,9 +331,15 @@ class SnippetService(
         return dtos.toList()
     }
 
-    fun getUserIdByEmail(email: String): String {
+    fun getUserIdByEmail(
+        accessToken: String,
+        email: String,
+    ): String {
         val url = uri + "api/v2/users-by-email?email=$email"
-        val response = restTemplate.exchange(url, HttpMethod.GET, null, Array<Auth0User>::class.java)
+        val headers = HttpHeaders()
+        headers.set("Authorization", "Bearer $accessToken")
+        val entity = HttpEntity<String>(headers)
+        val response = restTemplate.exchange(url, HttpMethod.GET, entity, Array<Auth0User>::class.java)
         val users = response.body ?: throw IOException("User not found")
         if (users.isEmpty()) throw IOException("User not found")
         return users[0].user_id

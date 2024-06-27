@@ -69,3 +69,9 @@ data class NewReaderForm(
 data class SnippetUpdate(val id: Int, val content: String)
 
 data class SnippetUpdateDTO(val content: String)
+
+data class User(
+    val id: String?,
+    val username: String?,
+    val email: String?,
+)
