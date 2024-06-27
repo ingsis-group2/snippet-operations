@@ -226,7 +226,7 @@ class SnippetService(
         page: Int,
     ): ResponseEntity<List<SnippetDTO>> {
         try {
-            val snippetGetterForm = SnippetGetterForm(userId, page, 4)
+            val snippetGetterForm = SnippetGetterForm(userId, page, 10)
             val requestEntity = HttpEntity(snippetGetterForm)
 
             val response =
@@ -324,7 +324,9 @@ class SnippetService(
         val dtos = mutableListOf<SnippetDTO>()
         snippets?.forEach { s ->
             val content = this.bucketRepository.get(s.id.toString(), s.container)
-            dtos.add(this.snippetDTO(s, content.toString()))
+            dtos.add(
+                this.snippetDTO(s, content.toString()),
+            )
         }
         return dtos.toList()
     }

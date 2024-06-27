@@ -2,6 +2,7 @@ package austral.ingsis.snippetops.controller
 
 import austral.ingsis.snippetops.dto.SnippetCreate
 import austral.ingsis.snippetops.dto.SnippetDTO
+import austral.ingsis.snippetops.dto.SnippetUpdateDTO
 import austral.ingsis.snippetops.service.SnippetService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
@@ -54,11 +55,11 @@ class SnippetController(
     @PutMapping("/{id}")
     fun updateSnippet(
         @PathVariable id: Long,
-        @RequestBody body: String,
+        @RequestBody body: SnippetUpdateDTO,
         @AuthenticationPrincipal user: Jwt,
     ): ResponseEntity<Boolean> {
         val userId = user.claims["sub"]
-        return snippetService.updateSnippet(id, body, userId.toString())
+        return snippetService.updateSnippet(id, body.content, userId.toString())
     }
 
     @GetMapping("/byWriter")
