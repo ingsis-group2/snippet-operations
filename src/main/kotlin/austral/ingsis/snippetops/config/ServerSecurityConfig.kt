@@ -1,5 +1,6 @@
 package austral.ingsis.snippetops.config
 
+import austral.ingsis.snippetperms.config.AudienceValidator
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -34,10 +35,9 @@ class ServerSecurityConfig(
                 .requestMatchers("/").permitAll()
                 .requestMatchers(GET, "/snippet/*").hasAuthority("SCOPE_read:snippet")
                 .requestMatchers(POST, "/snippet").hasAuthority("SCOPE_create:snippet")
-                .requestMatchers(GET, "/rules/lint").hasAuthority("SCOPE_read:snippet")
-                .requestMatchers(POST, "/rules/lint").hasAuthority("SCOPE_create:snippet")
-                .requestMatchers(GET, "/rules/format").hasAuthority("SCOPE_read:snippet")
-                .requestMatchers(POST, "/rules/format").hasAuthority("SCOPE_create:snippet")
+                .requestMatchers(GET, "/rules/*").hasAuthority("SCOPE_read:snippet")
+                .requestMatchers(POST, "/rules/*").hasAuthority("SCOPE_create:snippet")
+                .requestMatchers(POST, "/runner/*").hasAuthority("SCOPE_read:snippet")
                 .anyRequest().authenticated()
         }
             .oauth2ResourceServer { it.jwt(withDefaults()) }

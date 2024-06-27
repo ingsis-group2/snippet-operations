@@ -1,4 +1,4 @@
-package austral.ingsis.snippetops.controller
+package austral.ingsis.snippetperms.controller
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt

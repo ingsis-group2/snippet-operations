@@ -54,4 +54,10 @@ data class SnippetShow(
     val updateDate: String?,
 )
 
-data class SnippetUpdate(val id: Int, val content: String)
+data class SnippetGetterForm(
+    val userId: String,
+    val page: Int,
+    val size: Int,
+)
+
+data class SnippetUpdateDTO(val content: String)

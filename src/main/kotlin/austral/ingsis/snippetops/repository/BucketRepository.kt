@@ -19,17 +19,19 @@ interface BucketRepository {
         container: String,
     ): Optional<Any>
 
-    fun getUserLintingRules(userId: String): Optional<Map<String, Any>>
+    fun getRules(
+        key: String,
+        container: String,
+    ): Optional<Any>
 
-    fun saveUserLintingRules(
-        userId: String,
-        rules: Map<String, Any>,
-    ): Boolean
+    fun saveRules(
+        key: String,
+        container: String,
+        content: Map<String, Any>,
+    ): Optional<Any>
 
-    fun getUserFormattingRules(userId: String): Optional<Map<String, Any>>
-
-    fun saveUserFormattingRules(
-        userId: String,
-        rules: Map<String, Any>,
-    ): Boolean
+    fun deleteRules(
+        key: String,
+        container: String,
+    ): Optional<Any>
 }

@@ -41,4 +41,5 @@ jobs:
           script: |
             cd snippet-infra
             sudo docker compose -f docker-compose.dev.yml stop snippet-operations
+            sudo docker compose -f docker-compose.dev.yml pull snippet-operations
             sudo docker compose -f docker-compose.dev.yml up snippet-operations -d --build 
