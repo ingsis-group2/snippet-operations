@@ -29,9 +29,4 @@ interface BucketRepository {
         container: String,
         content: Map<String, Any>,
     ): Optional<Any>
-
-    fun deleteRules(
-        key: String,
-        container: String,
-    ): Optional<Any>
 }

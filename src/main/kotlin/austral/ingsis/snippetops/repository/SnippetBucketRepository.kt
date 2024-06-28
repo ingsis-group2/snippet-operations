@@ -10,14 +10,14 @@ import org.springframework.web.client.RestTemplate
 import java.util.Optional
 
 class SnippetBucketRepository(
-    val url: String,
-    val restTemplate: RestTemplate,
+    private val url: String,
+    private val restTemplate: RestTemplate,
 ) : BucketRepository {
     override fun get(
         key: String,
         container: String,
     ): Optional<Any> {
-        val url = "$url/$container/$key"
+        val url = buildUrl(key, container)
         return try {
             val response = restTemplate.exchange(url, HttpMethod.GET, null, String::class.java)
             return when (response.statusCode) {
@@ -43,18 +43,7 @@ class SnippetBucketRepository(
             }
         val requestEntity = HttpEntity(content, headers)
 
-        return try {
-            val response =
-                restTemplate.exchange(
-                    "$url/$container/$key",
-                    HttpMethod.POST,
-                    requestEntity,
-                    Void::class.java,
-                )
-            Optional.of(response.statusCode == HttpStatus.CREATED)
-        } catch (ex: HttpClientErrorException) {
-            Optional.empty()
-        }
+        return post(container, key, requestEntity)
     }
 
     override fun delete(
@@ -74,7 +63,7 @@ class SnippetBucketRepository(
         key: String,
         container: String,
     ): Optional<Any> {
-        val url = "$url/$container/$key"
+        val url = buildUrl(key, container)
         return try {
             val response = restTemplate.exchange(url, HttpMethod.GET, null, Map::class.java)
             return when (response.statusCode) {
@@ -101,9 +90,17 @@ class SnippetBucketRepository(
         val requestEntity = HttpEntity(content, headers)
 
         // First, delete the existing rules
-        deleteRules(key, container)
+        delete(key, container)
 
-        return try {
+        return post(container, key, requestEntity)
+    }
+
+    private fun post(
+        container: String,
+        key: String,
+        requestEntity: HttpEntity<*>,
+    ): Optional<Any> =
+        try {
             val response =
                 restTemplate.exchange(
                     "$url/$container/$key",
@@ -115,18 +112,11 @@ class SnippetBucketRepository(
         } catch (ex: HttpClientErrorException) {
             Optional.empty()
         }
-    }
 
-    override fun deleteRules(
+    private fun buildUrl(
         key: String,
         container: String,
-    ): Optional<Any> {
-        val url = "$url/$container/$key"
-        return try {
-            val response = restTemplate.exchange(url, HttpMethod.DELETE, null, Void::class.java)
-            Optional.of(response.statusCode == HttpStatus.OK)
-        } catch (e: Exception) {
-            Optional.empty()
-        }
+    ): String {
+        return "$url/$container/$key"
     }
 }
