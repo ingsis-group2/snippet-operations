@@ -4,6 +4,7 @@ import austral.ingsis.snippetops.dto.SnippetCreate
 import austral.ingsis.snippetops.dto.SnippetDTO
 import austral.ingsis.snippetops.dto.SnippetUpdateDTO
 import austral.ingsis.snippetops.service.SnippetService
+import austral.ingsis.snippetops.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
@@ -26,6 +27,7 @@ import org.springframework.web.client.RestTemplate
 class SnippetController(
     @Autowired val snippetService: SnippetService,
     @Autowired val restTemplate: RestTemplate,
+    @Autowired val userService: UserService,
 ) {
     @PostMapping("")
     fun createSnippet(
@@ -91,6 +93,7 @@ class SnippetController(
 
     @DeleteMapping("/{id}")
     fun deleteById(
+        @AuthenticationPrincipal user: Jwt,
         @PathVariable("id") id: Long,
     ): ResponseEntity<Boolean> {
         return this.snippetService.deleteSnippet(id)
@@ -107,14 +110,5 @@ class SnippetController(
         val url = "http://snippet-permissions:8080/snippet/greetBack"
         val response = restTemplate.exchange(url, HttpMethod.GET, null, String::class.java)
         return ResponseEntity(response.body, response.statusCode)
-    }
-
-    @GetMapping("userId/{mail}")
-    @ResponseBody
-    fun getUserIdByMail(
-        @PathVariable("mail") mail: String,
-        @AuthenticationPrincipal user: Jwt,
-    ): String {
-        return this.snippetService.getUserIdByEmail(mail, user.toString())
     }
 }

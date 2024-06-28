@@ -22,14 +22,13 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
-import java.io.IOException
 
 @Service
 class SnippetService(
     @Value("\${spring.services.snippet.permissions}") val url: String,
-    @Value("\${okta.oauth2.issuer}") val uri: String,
     @Autowired val bucketRepository: BucketRepository,
     @Autowired var restTemplate: RestTemplate,
+    @Autowired val userService: UserService,
 ) {
     fun createSnippet(
         body: SnippetCreate,
@@ -81,20 +80,21 @@ class SnippetService(
         snippetId: Long,
     ): ResponseEntity<Boolean> {
         try {
-            val readerId = this.getUserIdByEmail(readerMail, userId)
-            val requestEntity = HttpEntity(NewReaderForm(snippetId, userId, readerId))
-            val response =
-                restTemplate.exchange(
-                    "$url/snippet/addReader",
-                    HttpMethod.POST,
-                    requestEntity,
-                    Boolean::class.java,
-                )
-            if (response.statusCode == HttpStatus.OK) {
-                return ResponseEntity.ok().build()
-            } else {
-                throw BadRequestException()
+            val reader = this.userService.getUserByEmail(readerMail)
+            if (reader != null) {
+                val requestEntity = HttpEntity(NewReaderForm(snippetId, userId, reader.id))
+                val response =
+                    restTemplate.exchange(
+                        "$url/snippet/addReader",
+                        HttpMethod.POST,
+                        requestEntity,
+                        Boolean::class.java,
+                    )
+                if (response.statusCode == HttpStatus.OK) {
+                    return ResponseEntity.ok().build()
+                }
             }
+            throw BadRequestException()
         } catch (ex: Exception) {
             return ResponseEntity.badRequest().build()
         }
@@ -201,7 +201,7 @@ class SnippetService(
 
             val response =
                 restTemplate.exchange(
-                    "$url/snippet/byWriter",
+                    "$url/snippet/byReader",
                     HttpMethod.POST,
                     requestEntity,
                     object : ParameterizedTypeReference<List<SnippetPermissionsDTO>>() {},
@@ -231,7 +231,7 @@ class SnippetService(
 
             val response =
                 restTemplate.exchange(
-                    "$url/snippet/byWriter",
+                    "$url/snippet/byReaderAndWriter",
                     HttpMethod.POST,
                     requestEntity,
                     object : ParameterizedTypeReference<List<SnippetPermissionsDTO>>() {},
@@ -323,27 +323,11 @@ class SnippetService(
     private fun mapSnippetsIntoDtos(snippets: List<SnippetPermissionsDTO>?): List<SnippetDTO> {
         val dtos = mutableListOf<SnippetDTO>()
         snippets?.forEach { s ->
-            val content = this.bucketRepository.get(s.id.toString(), s.container)
+            val content = this.bucketRepository.get(s.id.toString(), s.container).get()
             dtos.add(
                 this.snippetDTO(s, content.toString()),
             )
         }
         return dtos.toList()
     }
-
-    fun getUserIdByEmail(
-        accessToken: String,
-        email: String,
-    ): String {
-        val url = uri + "api/v2/users-by-email?email=$email"
-        val headers = HttpHeaders()
-        headers.set("Authorization", "Bearer $accessToken")
-        val entity = HttpEntity<String>(headers)
-        val response = restTemplate.exchange(url, HttpMethod.GET, entity, Array<Auth0User>::class.java)
-        val users = response.body ?: throw IOException("User not found")
-        if (users.isEmpty()) throw IOException("User not found")
-        return users[0].user_id
-    }
 }
-
-data class Auth0User(val user_id: String)
