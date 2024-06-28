@@ -70,6 +70,7 @@ class UserRuleService(
             "assignationBefore" to true,
             "assignationAfter" to true,
             "printJump" to 1,
+            "ifIndentation" to 1,
         )
     }
 

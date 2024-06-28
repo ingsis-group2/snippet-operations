@@ -91,6 +91,7 @@ class SnippetController(
 
     @DeleteMapping("/{id}")
     fun deleteById(
+        @AuthenticationPrincipal user: Jwt,
         @PathVariable("id") id: Long,
     ): ResponseEntity<Boolean> {
         return this.snippetService.deleteSnippet(id)
