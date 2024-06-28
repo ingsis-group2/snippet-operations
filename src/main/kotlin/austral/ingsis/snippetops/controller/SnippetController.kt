@@ -108,13 +108,4 @@ class SnippetController(
         val response = restTemplate.exchange(url, HttpMethod.GET, null, String::class.java)
         return ResponseEntity(response.body, response.statusCode)
     }
-
-    @GetMapping("userId/{mail}")
-    @ResponseBody
-    fun getUserIdByMail(
-        @PathVariable("mail") mail: String,
-        @AuthenticationPrincipal user: Jwt,
-    ): String {
-        return this.snippetService.getUserIdByEmail(mail, user.toString())
-    }
 }
