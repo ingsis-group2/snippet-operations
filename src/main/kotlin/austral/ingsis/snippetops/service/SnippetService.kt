@@ -26,7 +26,6 @@ import org.springframework.web.client.RestTemplate
 @Service
 class SnippetService(
     @Value("\${spring.services.snippet.permissions}") val url: String,
-    @Value("\${okta.oauth2.issuer}") val uri: String,
     @Autowired val bucketRepository: BucketRepository,
     @Autowired var restTemplate: RestTemplate,
     @Autowired val userService: UserService,

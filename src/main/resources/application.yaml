@@ -24,3 +24,7 @@ okta:
     audience: ${AUTH0_AUDIENCE}
     client-id: ${AUTH_CLIENT_ID}
     client-secret: ${AUTH_CLIENT_SECRET}
+  machine:
+    audience: ${MACHINE_AUDIENCE}
+    client-id: ${MACHINE_CLIENT_ID}
+    client-secret: ${MACHINE_CLIENT_SECRET}
