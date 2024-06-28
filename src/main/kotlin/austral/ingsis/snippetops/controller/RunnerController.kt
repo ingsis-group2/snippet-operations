@@ -33,6 +33,7 @@ class RunnerController(
     suspend fun executeSnippet(
         @PathVariable id: Long,
         @RequestBody body: ExecutionDTO,
+        @AuthenticationPrincipal user: Jwt,
     ): ResponseEntity<ExecutionOutputDTO> {
         val snippet = snippetService.getSnippet(id).body ?: throw Exception("Snippet not found")
         val content = snippet.content
@@ -75,8 +76,7 @@ class RunnerController(
         @RequestBody version: String,
         @AuthenticationPrincipal user: Jwt,
     ): ResponseEntity<Boolean> {
-        // looks for test number {id}
-        // val testCase = snippetService.getTestCase(id).body ?: throw Exception("Test not found")
+        // val testCase = testCaseService.getTestCase(id).body ?: throw Exception("Test not found")
         // looks for the snippet from the test
         // val snippet = snippetService.getSnippet(testCase.snippetId).body ?: throw Exception("Snippet not found")
 
