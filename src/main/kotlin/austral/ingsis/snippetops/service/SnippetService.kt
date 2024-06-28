@@ -1,12 +1,6 @@
 package austral.ingsis.snippetops.service
 
-import austral.ingsis.snippetops.dto.NewReaderForm
-import austral.ingsis.snippetops.dto.SnippetCreate
-import austral.ingsis.snippetops.dto.SnippetDTO
-import austral.ingsis.snippetops.dto.SnippetGetterForm
-import austral.ingsis.snippetops.dto.SnippetLocation
-import austral.ingsis.snippetops.dto.SnippetPermissionsCreate
-import austral.ingsis.snippetops.dto.SnippetPermissionsDTO
+import austral.ingsis.snippetops.dto.*
 import austral.ingsis.snippetops.repository.BucketRepository
 import org.apache.coyote.BadRequestException
 import org.springframework.beans.factory.annotation.Autowired
@@ -82,7 +76,8 @@ class SnippetService(
         try {
             val reader = this.userService.getUserByEmail(readerMail)
             if (reader != null) {
-                val requestEntity = HttpEntity(NewReaderForm(snippetId, userId, reader.id.toString()))
+                println("I am making the request")
+                val requestEntity = HttpEntity(NewReaderForm(snippetId, userId, reader.id))
                 val response =
                     restTemplate.exchange(
                         "$url/snippet/addReader",

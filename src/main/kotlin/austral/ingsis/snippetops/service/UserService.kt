@@ -55,6 +55,8 @@ class UserService(
                     requestEntity,
                     Map::class.java,
                 )
+            println("Response: ${responseEntity.body}, ")
+            print("Status: ${responseEntity.statusCode}")
             if (responseEntity.statusCode == HttpStatus.OK) {
                 val responseBody = responseEntity.body
                 val user =
