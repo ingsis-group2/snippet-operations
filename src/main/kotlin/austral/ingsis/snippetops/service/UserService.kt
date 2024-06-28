@@ -46,7 +46,7 @@ class UserService(
     fun getUserByEmail(email: String): User? {
         val accessToken = this.getAccessToken()
         if (accessToken != null) {
-            val url = issuer + "/api/v2/users-by-email?email=$email"
+            val url = issuer + "api/v2/users-by-email?email=$email"
             val requestEntity = this.buildRequestEntity(accessToken)
             val responseEntity: ResponseEntity<Map<*, *>> =
                 restTemplate.exchange(
@@ -79,14 +79,15 @@ class UserService(
         Access token is not static
      */
     private fun getAccessToken(): String? {
-        val url = issuer + "/oauth/token"
+        val url = issuer + "oauth/token"
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
+        val audience = issuer + "api/v2/"
         val requestBody =
             mapOf(
                 "client_id" to clientId,
                 "client_secret" to clientSecret,
-                "audience" to "$issuer/api/v2/",
+                "audience" to audience,
                 "grant_type" to "client_credentials",
             )
         val requestEntity = HttpEntity(requestBody, headers)
