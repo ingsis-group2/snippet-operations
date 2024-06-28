@@ -1,4 +1,4 @@
-package austral.ingsis.snippetops.dto
+package austral.ingsis.snippetops.dto.permissions
 
 import java.time.LocalDateTime
 
