@@ -16,11 +16,11 @@ data class SnippetPermissionsDTO(
 
 data class SnippetDTO(
     val id: Long,
-    val writer: String,
+    val user: User,
     val name: String,
     val language: String,
     val extension: String,
-    val readers: List<String>,
+    val readers: List<User>,
     val content: String,
     val creationDate: LocalDateTime,
     val updateDate: LocalDateTime?,
