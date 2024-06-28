@@ -4,6 +4,7 @@ import austral.ingsis.snippetops.dto.SnippetCreate
 import austral.ingsis.snippetops.dto.SnippetDTO
 import austral.ingsis.snippetops.dto.SnippetUpdateDTO
 import austral.ingsis.snippetops.service.SnippetService
+import austral.ingsis.snippetops.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
@@ -26,6 +27,7 @@ import org.springframework.web.client.RestTemplate
 class SnippetController(
     @Autowired val snippetService: SnippetService,
     @Autowired val restTemplate: RestTemplate,
+    @Autowired val userService: UserService,
 ) {
     @PostMapping("")
     fun createSnippet(

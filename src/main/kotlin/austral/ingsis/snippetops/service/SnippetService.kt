@@ -324,7 +324,7 @@ class SnippetService(
     private fun mapSnippetsIntoDtos(snippets: List<SnippetPermissionsDTO>?): List<SnippetDTO> {
         val dtos = mutableListOf<SnippetDTO>()
         snippets?.forEach { s ->
-            val content = this.bucketRepository.get(s.id.toString(), s.container)
+            val content = this.bucketRepository.get(s.id.toString(), s.container).get()
             dtos.add(
                 this.snippetDTO(s, content.toString()),
             )
