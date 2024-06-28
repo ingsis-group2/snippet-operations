@@ -24,3 +24,7 @@ okta:
     audience: ${AUTH0_AUDIENCE}
     client-id: ${AUTH_CLIENT_ID}
     client-secret: ${AUTH_CLIENT_SECRET}
+
+server:
+  port: 8081
+
