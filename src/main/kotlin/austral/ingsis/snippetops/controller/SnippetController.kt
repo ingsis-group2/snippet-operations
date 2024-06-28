@@ -1,8 +1,8 @@
 package austral.ingsis.snippetops.controller
 
-import austral.ingsis.snippetops.dto.SnippetCreate
-import austral.ingsis.snippetops.dto.SnippetDTO
-import austral.ingsis.snippetops.dto.SnippetUpdateDTO
+import austral.ingsis.snippetops.dto.permissions.SnippetCreate
+import austral.ingsis.snippetops.dto.permissions.SnippetDTO
+import austral.ingsis.snippetops.dto.permissions.SnippetUpdateDTO
 import austral.ingsis.snippetops.service.SnippetService
 import austral.ingsis.snippetops.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
