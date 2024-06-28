@@ -43,17 +43,6 @@ data class SnippetPermissionsCreate(
     val content: String,
 )
 
-data class SnippetShow(
-    val id: String,
-    val name: String,
-    val writer: String,
-    val content: String,
-    val language: String,
-    val extension: String,
-    val creationDate: String,
-    val updateDate: String?,
-)
-
 data class SnippetGetterForm(
     val userId: String,
     val page: Int,
@@ -65,8 +54,6 @@ data class NewReaderForm(
     val userId: String,
     val readerId: String,
 )
-
-data class SnippetUpdate(val id: Int, val content: String)
 
 data class SnippetUpdateDTO(val content: String)
 
