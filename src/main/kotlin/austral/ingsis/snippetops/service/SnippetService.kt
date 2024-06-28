@@ -82,7 +82,6 @@ class SnippetService(
         try {
             val reader = this.userService.getUserByEmail(readerMail)
             if (reader != null) {
-                println("I am making the request")
                 val requestEntity = HttpEntity(NewReaderForm(snippetId, userId, reader.id))
                 val response =
                     restTemplate.exchange(
