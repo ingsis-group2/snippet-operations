@@ -57,11 +57,12 @@ class UserService(
                 )
             if (responseEntity.statusCode == HttpStatus.OK) {
                 val responseBody = responseEntity.body
-                val user = User(
-                    responseBody?.get("user_id").toString(),
-                    responseBody?.get("nickname").toString(),
-                    email,
-                )
+                val user =
+                    User(
+                        responseBody?.get("user_id").toString(),
+                        responseBody?.get("nickname").toString(),
+                        email,
+                    )
                 println("found user: ")
                 print(user)
                 return user
