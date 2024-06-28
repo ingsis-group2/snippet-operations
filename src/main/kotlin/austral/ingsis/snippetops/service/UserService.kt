@@ -14,8 +14,8 @@ import org.springframework.web.client.RestTemplate
 
 @Service
 class UserService(
-    @Value("\${okta.oauth2.client-id}") val clientId: String,
-    @Value("\${okta.oauth2.client-secret}") val clientSecret: String,
+    @Value("\${okta.machine.client-id}") val clientId: String,
+    @Value("\${okta.machine.client-secret}") val clientSecret: String,
     @Value("\${okta.oauth2.issuer}") val issuer: String,
     @Autowired var restTemplate: RestTemplate,
 ) {
@@ -57,11 +57,12 @@ class UserService(
                 )
             if (responseEntity.statusCode == HttpStatus.OK) {
                 val responseBody = responseEntity.body
-                val user = User(
-                    responseBody?.get("user_id").toString(),
-                    responseBody?.get("nickname").toString(),
-                    email,
-                )
+                val user =
+                    User(
+                        responseBody?.get("user_id").toString(),
+                        responseBody?.get("nickname").toString(),
+                        email,
+                    )
                 println("found user: ")
                 print(user)
                 return user
