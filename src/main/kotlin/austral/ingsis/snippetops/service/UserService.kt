@@ -49,19 +49,19 @@ class UserService(
         if (accessToken != null) {
             val url = issuer + "api/v2/users-by-email?email=$email"
             val requestEntity = this.buildRequestEntity(accessToken)
-            val responseEntity: ResponseEntity<Map<*, *>> =
+            val responseEntity: ResponseEntity<Array<*>> =
                 restTemplate.exchange(
                     url,
                     HttpMethod.GET,
                     requestEntity,
-                    Map::class.java,
+                    Array::class.java,
                 )
-            if (responseEntity.statusCode == HttpStatus.OK) {
-                val responseBody = responseEntity.body
+            if (responseEntity.statusCode == HttpStatus.OK && responseEntity.body != null) {
+                val responseBody = responseEntity.body!![0] as Map<*, *>
                 val user =
                     User(
-                        responseBody?.get("user_id").toString(),
-                        responseBody?.get("nickname").toString(),
+                        responseBody["user_id"].toString(),
+                        responseBody["nickname"].toString(),
                         email,
                     )
                 println("found user: ")
