@@ -5,7 +5,6 @@ import austral.ingsis.snippetops.dto.SnippetDTO
 import austral.ingsis.snippetops.dto.SnippetUpdateDTO
 import austral.ingsis.snippetops.service.SnippetService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
@@ -17,15 +16,12 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.client.RestTemplate
 
 @RestController
 @RequestMapping("/snippet")
 class SnippetController(
     @Autowired val snippetService: SnippetService,
-    @Autowired val restTemplate: RestTemplate,
 ) {
     @PostMapping("")
     fun createSnippet(
@@ -95,18 +91,5 @@ class SnippetController(
         @PathVariable("id") id: Long,
     ): ResponseEntity<Boolean> {
         return this.snippetService.deleteSnippet(id)
-    }
-
-    @GetMapping("/greet")
-    @ResponseBody
-    fun greet(): String {
-        return "hello stranger"
-    }
-
-    @GetMapping("/greet/permissions")
-    fun greetPermissions(): ResponseEntity<String> {
-        val url = "http://snippet-permissions:8080/snippet/greetBack"
-        val response = restTemplate.exchange(url, HttpMethod.GET, null, String::class.java)
-        return ResponseEntity(response.body, response.statusCode)
     }
 }

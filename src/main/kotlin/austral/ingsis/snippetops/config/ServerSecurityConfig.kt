@@ -38,6 +38,7 @@ class ServerSecurityConfig(
                 .requestMatchers(GET, "/rules/*").hasAuthority("SCOPE_read:snippet")
                 .requestMatchers(POST, "/rules/*").hasAuthority("SCOPE_create:snippet")
                 .requestMatchers(POST, "/runner/*").hasAuthority("SCOPE_read:snippet")
+                .requestMatchers(GET, "/user/*").hasAuthority("SCOPE_read:snippet")
                 .anyRequest().authenticated()
         }
             .oauth2ResourceServer { it.jwt(withDefaults()) }
