@@ -1,16 +1,17 @@
 package austral.ingsis.snippetops.service
 
-import austral.ingsis.snippetops.dto.NewReaderForm
-import austral.ingsis.snippetops.dto.SnippetCreate
-import austral.ingsis.snippetops.dto.SnippetDTO
-import austral.ingsis.snippetops.dto.SnippetGetterForm
-import austral.ingsis.snippetops.dto.SnippetLocation
-import austral.ingsis.snippetops.dto.SnippetPermissionsCreate
-import austral.ingsis.snippetops.dto.SnippetPermissionsDTO
-import austral.ingsis.snippetops.dto.User
+import austral.ingsis.snippetops.dto.permissions.NewReaderForm
+import austral.ingsis.snippetops.dto.permissions.SnippetCreate
+import austral.ingsis.snippetops.dto.permissions.SnippetDTO
+import austral.ingsis.snippetops.dto.permissions.SnippetGetterForm
+import austral.ingsis.snippetops.dto.permissions.SnippetLocation
+import austral.ingsis.snippetops.dto.permissions.SnippetPermissionsCreate
+import austral.ingsis.snippetops.dto.permissions.SnippetPermissionsDTO
+import austral.ingsis.snippetops.dto.permissions.User
 import austral.ingsis.snippetops.repository.BucketRepository
 import org.apache.coyote.BadRequestException
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
@@ -27,7 +28,7 @@ import org.springframework.web.client.RestTemplate
 @Service
 class SnippetService(
     @Value("\${spring.services.snippet.permissions}") val url: String,
-    @Autowired val bucketRepository: BucketRepository,
+    @Autowired @Qualifier("snippetBucketRepository") val bucketRepository: BucketRepository,
     @Autowired var restTemplate: RestTemplate,
     @Autowired val userService: UserService,
 ) {

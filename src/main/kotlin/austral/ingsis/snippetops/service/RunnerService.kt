@@ -1,6 +1,6 @@
 package austral.ingsis.snippetops.service
 
-import austral.ingsis.snippetops.dto.SnippetDTO
+import austral.ingsis.snippetops.dto.permissions.SnippetDTO
 import austral.ingsis.snippetops.dto.runner.execute.ExecutionOutputDTO
 import austral.ingsis.snippetops.dto.runner.execute.RunnerExecutionDTO
 import austral.ingsis.snippetops.dto.runner.format.FormatOutputDTO
