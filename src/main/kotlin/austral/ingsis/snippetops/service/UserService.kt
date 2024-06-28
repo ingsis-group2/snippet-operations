@@ -72,10 +72,13 @@ class UserService(
         return null
     }
 
-    fun getAllUsers(): List<User> {
+    fun getAllUsers(
+        page: Int,
+        size: Int,
+    ): List<User> {
         val accessToken = this.getAccessToken()
         if (accessToken != null) {
-            val url = issuer + "api/v2/users"
+            val url = issuer + "api/v2/users?limit=$size&offset=${page * size}"
             val requestEntity = this.buildRequestEntity(accessToken)
             val responseEntity: ResponseEntity<List<Map<*, *>>> =
                 restTemplate.exchange(
@@ -90,7 +93,7 @@ class UserService(
                     User(
                         userMap["id"].toString(),
                         userMap["nickname"].toString(),
-                        userMap["email"].toString(),
+                        userMap["profile"].toString(),
                     )
                 } ?: emptyList()
             }
