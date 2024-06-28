@@ -11,22 +11,11 @@ interface BucketRepository {
     fun save(
         key: String,
         container: String,
-        content: String,
+        content: Any,
     ): Optional<Any>
 
     fun delete(
         key: String,
         container: String,
-    ): Optional<Any>
-
-    fun getRules(
-        key: String,
-        container: String,
-    ): Optional<Any>
-
-    fun saveRules(
-        key: String,
-        container: String,
-        content: Map<String, Any>,
     ): Optional<Any>
 }
