@@ -57,11 +57,14 @@ class UserService(
                 )
             if (responseEntity.statusCode == HttpStatus.OK) {
                 val responseBody = responseEntity.body
-                return User(
+                val user = User(
                     responseBody?.get("user_id").toString(),
                     responseBody?.get("nickname").toString(),
                     email,
                 )
+                println("found user: ")
+                print(user)
+                return user
             }
         }
         return null
@@ -100,7 +103,8 @@ class UserService(
             )
         if (responseEntity.statusCode == HttpStatus.OK) {
             val responseBody = responseEntity.body
-            val accessToken = responseBody?.get("access_token") as String?
+            val accessToken = responseBody?.get("access_token").toString()
+            println("Management API Token: $accessToken")
             return accessToken
         } else {
             return null
