@@ -55,7 +55,6 @@ class TestCaseController(
         return this.testCaseService.getTestCaseFromSnippet(snippetId, userId)
     }
 
-
     @DeleteMapping("/{id}")
     fun deleteTestCase(
         @PathVariable("id") id: String,

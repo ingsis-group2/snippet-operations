@@ -58,7 +58,10 @@ class TestCaseService(
         }
     }
 
-    fun getTestCaseFromSnippet(snippetId: Long, userId: String): ResponseEntity<List<Any>> {
+    fun getTestCaseFromSnippet(
+        snippetId: Long,
+        userId: String,
+    ): ResponseEntity<List<Any>> {
         val testCases = getAllTestsCasesFromUser(userId)
         return when (testCases.statusCode) {
             HttpStatus.OK -> {
@@ -74,7 +77,6 @@ class TestCaseService(
             }
             else -> ResponseEntity.notFound().build()
         }
-
     }
 
     fun deleteTestCase(
