@@ -37,6 +37,8 @@ class ServerSecurityConfig(
                 .requestMatchers(POST, "/snippet").hasAuthority("SCOPE_create:snippet")
                 .requestMatchers(GET, "/rules/*").hasAuthority("SCOPE_read:snippet")
                 .requestMatchers(POST, "/rules/*").hasAuthority("SCOPE_create:snippet")
+                .requestMatchers(GET, "/testCase/*").hasAuthority("SCOPE_read:snippet")
+                .requestMatchers(POST, "/testCase").hasAuthority("SCOPE_read:Snippet")
                 .requestMatchers(POST, "/runner/*").hasAuthority("SCOPE_read:snippet")
                 .requestMatchers(GET, "/user/*").hasAuthority("SCOPE_read:snippet")
                 .anyRequest().authenticated()

@@ -1,13 +1,13 @@
 package austral.ingsis.snippetops.service
 
-import austral.ingsis.snippetops.dto.NewReaderForm
-import austral.ingsis.snippetops.dto.SnippetCreate
-import austral.ingsis.snippetops.dto.SnippetDTO
-import austral.ingsis.snippetops.dto.SnippetGetterForm
-import austral.ingsis.snippetops.dto.SnippetLocation
-import austral.ingsis.snippetops.dto.SnippetPermissionsCreate
-import austral.ingsis.snippetops.dto.SnippetPermissionsDTO
-import austral.ingsis.snippetops.dto.User
+import austral.ingsis.snippetops.dto.permissions.NewReaderForm
+import austral.ingsis.snippetops.dto.permissions.SnippetCreate
+import austral.ingsis.snippetops.dto.permissions.SnippetDTO
+import austral.ingsis.snippetops.dto.permissions.SnippetGetterForm
+import austral.ingsis.snippetops.dto.permissions.SnippetLocation
+import austral.ingsis.snippetops.dto.permissions.SnippetPermissionsCreate
+import austral.ingsis.snippetops.dto.permissions.SnippetPermissionsDTO
+import austral.ingsis.snippetops.dto.permissions.User
 import austral.ingsis.snippetops.repository.BucketRepository
 import org.apache.coyote.BadRequestException
 import org.springframework.beans.factory.annotation.Autowired
@@ -54,7 +54,7 @@ class SnippetService(
 
             if (permissionsResponse.body != null) {
                 val snippet = permissionsResponse.body as SnippetPermissionsDTO
-                val result = bucketRepository.save(snippet.id.toString(), snippet.container, body.content)
+                val result = bucketRepository.save(snippet.id.toString(), snippet.container, body.content, String::class.java)
                 if (result.isPresent) {
                     return if (result.get() == true) {
                         ResponseEntity(this.snippetDTO(snippet, result.toString()), HttpStatus.CREATED)
@@ -107,21 +107,13 @@ class SnippetService(
         userId: String,
     ): ResponseEntity<Boolean> {
         try {
-            // Check if the snippet exists
             val existingSnippet = this.getSnippet(id)
             if (existingSnippet.statusCode != HttpStatus.OK) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build()
             }
 
-            // Delete the existing snippet from the bucket
             val snippet = existingSnippet.body
-            val deleteResponse = this.bucketRepository.delete(snippet?.id.toString(), "snippet")
-            if (!deleteResponse.isPresent) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build()
-            }
-
-            // Put the new snippet in the same place
-            val result = this.bucketRepository.save(snippet?.id.toString(), "snippet", body)
+            val result = this.bucketRepository.save(snippet?.id.toString(), "snippet", body, String::class.java)
             if (!result.isPresent) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build()
             }
@@ -148,7 +140,7 @@ class SnippetService(
                     ResponseEntity.status(ex.statusCode).build()
                 }
             val snippet = permissionResponse.body as SnippetPermissionsDTO
-            val content = this.bucketRepository.get(snippet.id.toString(), snippet.container)
+            val content = this.bucketRepository.get(snippet.id.toString(), snippet.container, String::class.java)
             return when {
                 content.isPresent ->
                     ResponseEntity.ok()
@@ -297,7 +289,7 @@ class SnippetService(
     private fun mapSnippetsIntoDtos(snippets: List<SnippetPermissionsDTO>?): List<SnippetDTO> {
         val dtos = mutableListOf<SnippetDTO>()
         snippets?.forEach { s ->
-            val content = this.bucketRepository.get(s.id.toString(), s.container).get()
+            val content = this.bucketRepository.get(s.id.toString(), s.container, String::class.java).get()
             dtos.add(
                 this.snippetDTO(s, content.toString()),
             )
