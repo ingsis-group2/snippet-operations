@@ -4,7 +4,6 @@ import austral.ingsis.snippetops.dto.permissions.SnippetCreate
 import austral.ingsis.snippetops.dto.permissions.SnippetDTO
 import austral.ingsis.snippetops.dto.permissions.SnippetUpdateDTO
 import austral.ingsis.snippetops.service.SnippetService
-import austral.ingsis.snippetops.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
