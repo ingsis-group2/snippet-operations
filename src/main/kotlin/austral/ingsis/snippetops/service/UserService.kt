@@ -3,6 +3,7 @@ package austral.ingsis.snippetops.service
 import austral.ingsis.snippetops.dto.permissions.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -69,6 +70,35 @@ class UserService(
             }
         }
         return null
+    }
+
+    fun getAllUsers(
+        page: Int,
+        size: Int,
+    ): List<User> {
+        val accessToken = this.getAccessToken()
+        if (accessToken != null) {
+            val url = issuer + "api/v2/users?limit=$size&offset=${page * size}"
+            val requestEntity = this.buildRequestEntity(accessToken)
+            val responseEntity: ResponseEntity<List<Map<*, *>>> =
+                restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    requestEntity,
+                    object : ParameterizedTypeReference<List<Map<*, *>>>() {},
+                )
+            if (responseEntity.statusCode == HttpStatus.OK) {
+                val responseBody = responseEntity.body
+                return responseBody?.map { userMap ->
+                    User(
+                        userMap["id"].toString(),
+                        userMap["nickname"].toString(),
+                        userMap["profile"].toString(),
+                    )
+                } ?: emptyList()
+            }
+        }
+        return emptyList()
     }
 
     fun getNicknameById(userId: String): String? {
