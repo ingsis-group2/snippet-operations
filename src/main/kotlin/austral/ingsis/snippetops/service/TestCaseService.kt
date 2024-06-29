@@ -13,17 +13,20 @@ import java.util.UUID
 class TestCaseService(
     @Autowired val bucketRepository: BucketRepository,
 ) {
-
-    fun createTestCase(body: CreateTestCase, userId: String): ResponseEntity<OperationsTestDTO> {
+    fun createTestCase(
+        body: CreateTestCase,
+        userId: String,
+    ): ResponseEntity<OperationsTestDTO> {
         val testCaseId = UUID.randomUUID().toString()
-        val testCase = OperationsTestDTO(
-            id = testCaseId,
-            snippetId = body.snippetId,
-            version = body.version,
-            inputs = body.inputs,
-            envs = body.envs,
-            output = body.output,
-        )
+        val testCase =
+            OperationsTestDTO(
+                id = testCaseId,
+                snippetId = body.snippetId,
+                version = body.version,
+                inputs = body.inputs,
+                envs = body.envs,
+                output = body.output,
+            )
         bucketRepository.save(testCaseId, "test", testCase, OperationsTestDTO::class.java)
         this.saveId(userId, testCaseId)
         return ResponseEntity(testCase, HttpStatus.CREATED)
@@ -51,7 +54,10 @@ class TestCaseService(
         }
     }
 
-    fun deleteTestCase(testCaseId: String, userId: String): ResponseEntity<Void> {
+    fun deleteTestCase(
+        testCaseId: String,
+        userId: String,
+    ): ResponseEntity<Void> {
         val response = this.bucketRepository.delete(testCaseId, "test")
         return when {
             response.isEmpty -> ResponseEntity.notFound().build()
@@ -59,18 +65,21 @@ class TestCaseService(
         }
     }
 
-    private fun saveId(userId: String, testCaseId: String) {
+    private fun saveId(
+        userId: String,
+        testCaseId: String,
+    ) {
         val key = userId.substring(6, userId.length)
         val data = bucketRepository.get(key, "testCaseId", List::class.java)
         if (data.isEmpty()) {
             val newData = listOf(testCaseId)
-            bucketRepository.save(key, "testCaseId", newData,List::class.java)
+            bucketRepository.save(key, "testCaseId", newData, List::class.java)
         } else {
             val newData = mutableListOf<String>()
             val unboxedData = data.get() as List<*>
-            unboxedData.forEach {id -> newData.add(id.toString())}
+            unboxedData.forEach { id -> newData.add(id.toString()) }
             newData.add(testCaseId)
-            bucketRepository.save(key, "testCaseId", newData.toList(),List::class.java)
+            bucketRepository.save(key, "testCaseId", newData.toList(), List::class.java)
         }
     }
 }
