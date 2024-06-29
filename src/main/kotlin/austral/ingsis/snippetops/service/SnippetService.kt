@@ -11,7 +11,6 @@ import austral.ingsis.snippetops.dto.permissions.User
 import austral.ingsis.snippetops.repository.BucketRepository
 import org.apache.coyote.BadRequestException
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
@@ -28,7 +27,7 @@ import org.springframework.web.client.RestTemplate
 @Service
 class SnippetService(
     @Value("\${spring.services.snippet.permissions}") val url: String,
-    @Autowired @Qualifier("snippetBucketRepository") val bucketRepository: BucketRepository,
+    @Autowired val bucketRepository: BucketRepository,
     @Autowired var restTemplate: RestTemplate,
     @Autowired val userService: UserService,
 ) {
@@ -55,7 +54,7 @@ class SnippetService(
 
             if (permissionsResponse.body != null) {
                 val snippet = permissionsResponse.body as SnippetPermissionsDTO
-                val result = bucketRepository.save(snippet.id.toString(), snippet.container, body.content)
+                val result = bucketRepository.save(snippet.id.toString(), snippet.container, body.content, String::class.java)
                 if (result.isPresent) {
                     return if (result.get() == true) {
                         ResponseEntity(this.snippetDTO(snippet, result.toString()), HttpStatus.CREATED)
@@ -108,21 +107,13 @@ class SnippetService(
         userId: String,
     ): ResponseEntity<Boolean> {
         try {
-            // Check if the snippet exists
             val existingSnippet = this.getSnippet(id)
             if (existingSnippet.statusCode != HttpStatus.OK) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build()
             }
 
-            // Delete the existing snippet from the bucket
             val snippet = existingSnippet.body
-            val deleteResponse = this.bucketRepository.delete(snippet?.id.toString(), "snippet")
-            if (!deleteResponse.isPresent) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build()
-            }
-
-            // Put the new snippet in the same place
-            val result = this.bucketRepository.save(snippet?.id.toString(), "snippet", body)
+            val result = this.bucketRepository.save(snippet?.id.toString(), "snippet", body, String::class.java)
             if (!result.isPresent) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build()
             }
@@ -149,7 +140,7 @@ class SnippetService(
                     ResponseEntity.status(ex.statusCode).build()
                 }
             val snippet = permissionResponse.body as SnippetPermissionsDTO
-            val content = this.bucketRepository.get(snippet.id.toString(), snippet.container)
+            val content = this.bucketRepository.get(snippet.id.toString(), snippet.container, String::class.java)
             return when {
                 content.isPresent ->
                     ResponseEntity.ok()
@@ -254,6 +245,14 @@ class SnippetService(
         }
     }
 
+    fun getContent(key: String, container: String): ResponseEntity<String> {
+        return ResponseEntity.ok(this.bucketRepository.get(key, container, String::class.java).get().toString())
+    }
+
+    fun saveContent(key: String, container: String, content: String): ResponseEntity<Any> {
+        return ResponseEntity.ok(this.bucketRepository.save(container, key, content, String::class.java).get())
+    }
+
     private fun checkCreateBody(body: SnippetCreate) {
         if (
             body.content.isBlank() || body.name.isBlank() || body.language.isBlank() || body.extension.isBlank()
@@ -298,7 +297,7 @@ class SnippetService(
     private fun mapSnippetsIntoDtos(snippets: List<SnippetPermissionsDTO>?): List<SnippetDTO> {
         val dtos = mutableListOf<SnippetDTO>()
         snippets?.forEach { s ->
-            val content = this.bucketRepository.get(s.id.toString(), s.container).get()
+            val content = this.bucketRepository.get(s.id.toString(), s.container, String::class.java).get()
             dtos.add(
                 this.snippetDTO(s, content.toString()),
             )

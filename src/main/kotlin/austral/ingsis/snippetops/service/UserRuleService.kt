@@ -2,13 +2,12 @@ package austral.ingsis.snippetops.service
 
 import austral.ingsis.snippetops.repository.BucketRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
 @Service
 class UserRuleService(
-    @Autowired @Qualifier("rulesBucketRepository") val bucketRepository: BucketRepository,
+    @Autowired val bucketRepository: BucketRepository,
 ) {
     fun getUserRules(
         userId: String,
@@ -17,7 +16,7 @@ class UserRuleService(
         // remove the auth0| prefix from the userId to avoid issues with the bucket repository
         val splicedId = extractAuth0UserId(userId)
         return try {
-            val rules = bucketRepository.get(splicedId, container)
+            val rules = bucketRepository.get(splicedId, container, Map::class.java)
             if (rules.isPresent) {
                 ResponseEntity.ok().body(rules.get() as Map<*, *>)
             } else {
@@ -27,7 +26,7 @@ class UserRuleService(
                     } else {
                         defaultFormattingRules()
                     }
-                bucketRepository.save(splicedId, container, defaultRules)
+                bucketRepository.save(splicedId, container, defaultRules, Map::class.java)
                 ResponseEntity.ok().body(defaultRules)
             }
         } catch (e: Exception) {
@@ -42,7 +41,7 @@ class UserRuleService(
     ): ResponseEntity<Boolean> {
         val splicedId = extractAuth0UserId(userId)
         return try {
-            val result = this.bucketRepository.save(splicedId, container, content)
+            val result = this.bucketRepository.save(splicedId, container, content, Map::class.java)
             if (result.isPresent) {
                 if (result.get() == true) {
                     ResponseEntity.status(201).build()

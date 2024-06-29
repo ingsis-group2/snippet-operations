@@ -1,10 +1,7 @@
 package austral.ingsis.snippetops.config
 
 import austral.ingsis.snippetops.repository.BucketRepository
-import austral.ingsis.snippetops.repository.RulesBucketRepository
-import austral.ingsis.snippetops.repository.SnippetBucketRepository
-import austral.ingsis.snippetops.repository.TestCaseBucketRepository
-import org.springframework.beans.factory.annotation.Qualifier
+import austral.ingsis.snippetops.repository.BucketRepositoryImpl
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
@@ -14,7 +11,6 @@ import org.springframework.web.client.RestTemplate
 
 @Configuration
 class AppConfig {
-
     @Bean
     fun restTemplate(): RestTemplate {
         return RestTemplateBuilder()
@@ -29,29 +25,10 @@ class AppConfig {
     }
 
     @Bean
-    @Qualifier("snippetBucketRepository")
-    fun snippetBucketRepository(
-        restTemplate: RestTemplate,
-        @Value("\${}") url: String
-    ): BucketRepository {
-        return SnippetBucketRepository(url, restTemplate)
-    }
-
-    @Bean
-    @Qualifier("testCaseBucketRepository")
-    fun testCaseBucketRepository(
-        restTemplate: RestTemplate,
-        @Value("\${spring.services.testcase.permissions}") url: String
-    ): BucketRepository {
-        return TestCaseBucketRepository(url, restTemplate)
-    }
-
-    @Bean
-    @Qualifier("rulesBucketRepository")
-    fun rulesBucketRepository(
+    fun bucketRepository(
         restTemplate: RestTemplate,
         @Value("\${spring.services.snippet.bucket}") url: String,
     ): BucketRepository {
-        return RulesBucketRepository(url, restTemplate)
+        return BucketRepositoryImpl(url, restTemplate)
     }
 }

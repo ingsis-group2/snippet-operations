@@ -27,7 +27,6 @@ import org.springframework.web.client.RestTemplate
 class SnippetController(
     @Autowired val snippetService: SnippetService,
     @Autowired val restTemplate: RestTemplate,
-    @Autowired val userService: UserService,
 ) {
     @PostMapping("")
     fun createSnippet(
