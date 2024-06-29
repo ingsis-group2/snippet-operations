@@ -21,6 +21,7 @@ class TestCaseService(
         val testCase =
             OperationsTestDTO(
                 id = testCaseId,
+                name = body.name,
                 snippetId = body.snippetId,
                 version = body.version,
                 inputs = body.inputs,
@@ -28,8 +29,11 @@ class TestCaseService(
                 output = body.output,
             )
         bucketRepository.save(testCaseId, "test", testCase, OperationsTestDTO::class.java)
-        this.saveId(userId, testCaseId)
-        return ResponseEntity(testCase, HttpStatus.CREATED)
+        val isSaved = this.saveId(userId, testCaseId)
+        return when {
+            isSaved -> ResponseEntity(testCase, HttpStatus.CREATED)
+            else -> ResponseEntity.badRequest().build()
+        }
     }
 
     fun getTestCase(testCaseId: String): ResponseEntity<Any> {
@@ -54,13 +58,33 @@ class TestCaseService(
         }
     }
 
+    fun getTestCaseFromSnippet(snippetId: Long, userId: String): ResponseEntity<List<Any>> {
+        val testCases = getAllTestsCasesFromUser(userId)
+        return when (testCases.statusCode) {
+            HttpStatus.OK -> {
+                val response = mutableListOf<Any>()
+                val body = testCases.body as List<*>
+                for (testCase in body) {
+                    testCase as OperationsTestDTO
+                    if (testCase.snippetId == snippetId) {
+                        response.add(response)
+                    }
+                }
+                ResponseEntity.ok(response.toList())
+            }
+            else -> ResponseEntity.notFound().build()
+        }
+
+    }
+
     fun deleteTestCase(
         testCaseId: String,
         userId: String,
     ): ResponseEntity<Void> {
+        val isIdDeleted = this.deleteId(userId, testCaseId)
         val response = this.bucketRepository.delete(testCaseId, "test")
         return when {
-            response.isEmpty -> ResponseEntity.notFound().build()
+            response.isEmpty || !isIdDeleted -> ResponseEntity.notFound().build()
             else -> ResponseEntity.ok().build()
         }
     }
@@ -68,18 +92,37 @@ class TestCaseService(
     private fun saveId(
         userId: String,
         testCaseId: String,
-    ) {
+    ): Boolean {
         val key = userId.substring(6, userId.length)
         val data = bucketRepository.get(key, "testCaseId", List::class.java)
         if (data.isEmpty()) {
             val newData = listOf(testCaseId)
-            bucketRepository.save(key, "testCaseId", newData, List::class.java)
+            return bucketRepository.save(key, "testCaseId", newData, List::class.java).isPresent
         } else {
             val newData = mutableListOf<String>()
             val unboxedData = data.get() as List<*>
             unboxedData.forEach { id -> newData.add(id.toString()) }
             newData.add(testCaseId)
-            bucketRepository.save(key, "testCaseId", newData.toList(), List::class.java)
+            return bucketRepository.save(key, "testCaseId", newData.toList(), List::class.java).isPresent
         }
+    }
+
+    private fun deleteId(
+        userId: String,
+        testCaseId: String,
+    ): Boolean {
+        val key = userId.substring(6, userId.length)
+        val data = bucketRepository.get(key, "testCaseId", List::class.java)
+        if (data.isPresent) {
+            val lst = data.get() as List<*>
+            val newData = mutableListOf<String>()
+            for (id in lst) {
+                if (id.toString() != testCaseId) {
+                    newData.add(id.toString())
+                }
+            }
+            return bucketRepository.save(key, "testCaseId", newData.toList(), List::class.java).isPresent
+        }
+        return false
     }
 }

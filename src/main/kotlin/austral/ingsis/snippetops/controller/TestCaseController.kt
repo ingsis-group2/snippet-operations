@@ -46,6 +46,16 @@ class TestCaseController(
         return this.testCaseService.getAllTestsCasesFromUser(userId)
     }
 
+    @GetMapping("/{snippetId}")
+    fun getAllTestCasesFromSnippet(
+        @PathVariable("snippetId") snippetId: Long,
+        @AuthenticationPrincipal user: Jwt,
+    ): ResponseEntity<List<Any>> {
+        val userId = this.getUserId(user)
+        return this.testCaseService.getTestCaseFromSnippet(snippetId, userId)
+    }
+
+
     @DeleteMapping("/{id}")
     fun deleteTestCase(
         @PathVariable("id") id: String,
