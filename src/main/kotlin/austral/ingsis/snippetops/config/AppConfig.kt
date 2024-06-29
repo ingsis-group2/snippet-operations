@@ -1,7 +1,5 @@
 package austral.ingsis.snippetops.config
 
-import austral.ingsis.snippetops.config.counter.Counter
-import austral.ingsis.snippetops.config.counter.NaturalCounter
 import austral.ingsis.snippetops.repository.BucketRepository
 import austral.ingsis.snippetops.repository.BucketRepositoryImpl
 import org.springframework.beans.factory.annotation.Value
@@ -32,10 +30,5 @@ class AppConfig {
         @Value("\${spring.services.snippet.bucket}") url: String,
     ): BucketRepository {
         return BucketRepositoryImpl(url, restTemplate)
-    }
-
-    @Bean
-    fun counter(): Counter {
-        return NaturalCounter()
     }
 }
