@@ -245,21 +245,6 @@ class SnippetService(
         }
     }
 
-    fun getContent(
-        key: String,
-        container: String,
-    ): ResponseEntity<String> {
-        return ResponseEntity.ok(this.bucketRepository.get(key, container, String::class.java).get().toString())
-    }
-
-    fun saveContent(
-        key: String,
-        container: String,
-        content: String,
-    ): ResponseEntity<Any> {
-        return ResponseEntity.ok(this.bucketRepository.save(container, key, content, String::class.java).get())
-    }
-
     private fun checkCreateBody(body: SnippetCreate) {
         if (
             body.content.isBlank() || body.name.isBlank() || body.language.isBlank() || body.extension.isBlank()
