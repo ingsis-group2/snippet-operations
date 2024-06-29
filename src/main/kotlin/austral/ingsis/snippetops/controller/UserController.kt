@@ -1,6 +1,6 @@
 package austral.ingsis.snippetops.controller
 
-import austral.ingsis.snippetops.dto.User
+import austral.ingsis.snippetops.dto.permissions.User
 import austral.ingsis.snippetops.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
