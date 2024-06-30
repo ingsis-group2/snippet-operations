@@ -52,7 +52,7 @@ class TestCaseService(
             else -> {
                 val ids = testCasesIds.get() as List<*>
                 val response = mutableListOf<Any>()
-                ids.forEach { id -> response.add(this.getTestCase(id.toString()).body) }
+                ids.forEach { id -> this.getTestCase(id.toString()).body?.let { response.add(it) } }
                 return ResponseEntity.ok(response.toList())
             }
         }
