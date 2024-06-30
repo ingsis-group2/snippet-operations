@@ -96,16 +96,16 @@ class TestCaseService(
         testCaseId: String,
     ): Boolean {
         val key = userId.substring(6, userId.length)
-        val data = bucketRepository.get(key, "testCaseId", List::class.java)
+        val data = bucketRepository.get(key, "test-case-id", List::class.java)
         if (data.isEmpty()) {
             val newData = listOf(testCaseId)
-            return bucketRepository.save(key, "testCaseId", newData, List::class.java).isPresent
+            return bucketRepository.save(key, "test-case-id", newData, List::class.java).isPresent
         } else {
             val newData = mutableListOf<String>()
             val unboxedData = data.get() as List<*>
             unboxedData.forEach { id -> newData.add(id.toString()) }
             newData.add(testCaseId)
-            return bucketRepository.save(key, "testCaseId", newData.toList(), List::class.java).isPresent
+            return bucketRepository.save(key, "test-case-id", newData.toList(), List::class.java).isPresent
         }
     }
 
@@ -114,7 +114,7 @@ class TestCaseService(
         testCaseId: String,
     ): Boolean {
         val key = userId.substring(6, userId.length)
-        val data = bucketRepository.get(key, "testCaseId", List::class.java)
+        val data = bucketRepository.get(key, "test-case-id", List::class.java)
         if (data.isPresent) {
             val lst = data.get() as List<*>
             val newData = mutableListOf<String>()
@@ -123,7 +123,7 @@ class TestCaseService(
                     newData.add(id.toString())
                 }
             }
-            return bucketRepository.save(key, "testCaseId", newData.toList(), List::class.java).isPresent
+            return bucketRepository.save(key, "test-case-id", newData.toList(), List::class.java).isPresent
         }
         return false
     }
