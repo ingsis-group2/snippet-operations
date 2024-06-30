@@ -46,7 +46,7 @@ class TestCaseController(
         return this.testCaseService.getAllTestsCasesFromUser(userId)
     }
 
-    @GetMapping("/{snippetId}")
+    @GetMapping("/bySnippetId/{snippetId}")
     fun getAllTestCasesFromSnippet(
         @PathVariable("snippetId") snippetId: Long,
         @AuthenticationPrincipal user: Jwt,
