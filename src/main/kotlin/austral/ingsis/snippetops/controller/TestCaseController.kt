@@ -38,7 +38,7 @@ class TestCaseController(
         return this.testCaseService.getTestCase(id)
     }
 
-    @GetMapping("")
+    @GetMapping
     fun getAllTestCasesByUser(
         @AuthenticationPrincipal user: Jwt,
     ): ResponseEntity<List<Any>> {
