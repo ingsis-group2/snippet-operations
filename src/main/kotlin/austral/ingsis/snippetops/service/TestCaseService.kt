@@ -46,7 +46,7 @@ class TestCaseService(
 
     fun getAllTestsCasesFromUser(userId: String): ResponseEntity<List<Any>> {
         val key = userId.substring(6, userId.length)
-        val testCasesIds = bucketRepository.get(key, "testCaseId", List::class.java)
+        val testCasesIds = bucketRepository.get(key, "test-case-id", List::class.java)
         return when {
             testCasesIds.isEmpty() -> ResponseEntity.notFound().build()
             else -> {
