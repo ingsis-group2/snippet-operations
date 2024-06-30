@@ -32,9 +32,7 @@ class TestCaseController(
     @GetMapping("/{id}")
     fun getTestCase(
         @PathVariable("id") id: String,
-        @AuthenticationPrincipal user: Jwt,
     ): ResponseEntity<Any> {
-        val userId = this.getUserId(user)
         return this.testCaseService.getTestCase(id)
     }
 
