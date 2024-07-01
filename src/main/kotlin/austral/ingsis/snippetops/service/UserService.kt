@@ -91,9 +91,9 @@ class UserService(
                 val responseBody = responseEntity.body
                 return responseBody?.map { userMap ->
                     User(
-                        userMap["id"].toString(),
+                        userMap["user_id"].toString(),
                         userMap["nickname"].toString(),
-                        userMap["profile"].toString(),
+                        userMap["email"].toString(),
                     )
                 } ?: emptyList()
             }
