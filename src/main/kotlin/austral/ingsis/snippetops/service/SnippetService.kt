@@ -112,6 +112,11 @@ class SnippetService(
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build()
             }
 
+            // if user is not the writer, return forbidden
+            if (existingSnippet.body?.user?.id != userId) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+            }
+
             val snippet = existingSnippet.body
             val result = this.bucketRepository.save(snippet?.id.toString(), "snippet", body, String::class.java)
             if (!result.isPresent) {
