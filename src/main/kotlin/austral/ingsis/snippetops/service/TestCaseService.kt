@@ -45,7 +45,7 @@ class TestCaseService(
     }
 
     fun getAllTestsCasesFromUser(userId: String): ResponseEntity<List<Any>> {
-        val key = userId.substring(6, userId.length)
+        val key = sliceUserId(userId)
         val testCasesIds = bucketRepository.get(key, "test-case-id", List::class.java)
         return when {
             testCasesIds.isEmpty() -> ResponseEntity.notFound().build()
@@ -95,7 +95,7 @@ class TestCaseService(
         userId: String,
         testCaseId: String,
     ): Boolean {
-        val key = userId.substring(6, userId.length)
+        val key = sliceUserId(userId)
         val data = bucketRepository.get(key, "test-case-id", List::class.java)
         if (data.isEmpty()) {
             val newData = listOf(testCaseId)
@@ -113,7 +113,7 @@ class TestCaseService(
         userId: String,
         testCaseId: String,
     ): Boolean {
-        val key = userId.substring(6, userId.length)
+        val key = sliceUserId(userId)
         val data = bucketRepository.get(key, "test-case-id", List::class.java)
         if (data.isPresent) {
             val lst = data.get() as List<*>
@@ -126,5 +126,9 @@ class TestCaseService(
             return bucketRepository.save(key, "test-case-id", newData.toList(), List::class.java).isPresent
         }
         return false
+    }
+
+    private fun sliceUserId(fullUserId: String): String {
+        return fullUserId.substringAfter("|")
     }
 }
