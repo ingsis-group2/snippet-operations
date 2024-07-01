@@ -23,8 +23,8 @@ repositories {
         name = "GitHubPackages"
         url = uri("https://maven.pkg.github.com/austral-ingsis/class-redis-stream")
         credentials {
-            username = project.properties["github.user"] as String
-            password = project.properties["github.token"] as String
+            username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+            password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
         }
     }
 }
@@ -49,8 +49,8 @@ dependencies {
     implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.3")
+
     implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
-    implementation("org.austral.ingsis:redis-streams-mvc:0.1.13")
     implementation("org.austral.ingsis:redis-streams-flux:0.1.13")
 }
 

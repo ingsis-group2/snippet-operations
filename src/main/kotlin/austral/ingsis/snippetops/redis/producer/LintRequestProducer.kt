@@ -1,5 +1,6 @@
 package austral.ingsis.snippetops.redis.producer
 
+import kotlinx.coroutines.reactor.awaitSingle
 import org.austral.ingsis.redis.RedisStreamProducer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -10,17 +11,17 @@ import org.springframework.stereotype.Component
 class LintRequestProducer
     @Autowired
     constructor(
-        @Value("\${stream.keys.linting}") streamKey: String,
+        @Value("\${redis.stream.request_linter_key}") streamKey: String,
         redis: ReactiveRedisTemplate<String, String>,
     ) : RedisStreamProducer(streamKey, redis) {
         suspend fun publishLintRequest(event: LintRequest) {
-            println("publishing on stream: $event")
-            emit(event)
+            println("publishing on lint stream: $event")
+            emit(event).awaitSingle()
         }
     }
 
 data class LintRequest(
-    val snippetId: Int,
+    val snippetId: Long,
     val version: String,
     val snippetContent: String,
     val lintRules: Map<String, Any>,
