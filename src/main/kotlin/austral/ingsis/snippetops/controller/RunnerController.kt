@@ -41,7 +41,7 @@ class RunnerController(
     ): ResponseEntity<ExecutionOutputDTO> {
         val snippet = snippetService.getSnippet(id).body ?: throw Exception("Snippet not found")
         val content = snippet.content
-        return runnerService.executeSnippet(RunnerExecutionDTO(content, body.version, body.inputs))
+        return runnerService.executeSnippet(RunnerExecutionDTO(content, body.version, body.inputs, snippet.language))
     }
 
     @PostMapping("/format/{id}")
@@ -57,7 +57,11 @@ class RunnerController(
 
         val rules = userRuleService.getUserRules(user.claims["sub"].toString(), "format")
         val unwrappedRules = rules.body ?: throw Exception("Rules not found")
-        return runnerService.formatSnippet(RunnerFormatDTO(content, body.version, unwrappedRules as Map<String, Any>), snippet, userId)
+        return runnerService.formatSnippet(
+            RunnerFormatDTO(content, body.version, unwrappedRules as Map<String, Any>, snippet.language),
+            snippet,
+            userId,
+        )
     }
 
     @PostMapping("/lint/{id}")
@@ -71,7 +75,7 @@ class RunnerController(
 
         val rules = userRuleService.getUserRules(user.claims["sub"].toString(), "lint")
         val unwrappedRules = rules.body ?: throw Exception("Rules not found")
-        return runnerService.lintSnippet(RunnerLintDTO(content, body.version, unwrappedRules as Map<String, Any>))
+        return runnerService.lintSnippet(RunnerLintDTO(content, body.version, unwrappedRules as Map<String, Any>, snippet.language))
     }
 
     @PostMapping("/test/{testId}")
@@ -83,6 +87,8 @@ class RunnerController(
         val testCase = testCaseService.getTestCase(testId).body as OperationsTestDTO
         val snippet = snippetService.getSnippet(testCase.snippetId).body ?: throw Exception("Snippet not found")
         val content = snippet.content
-        return runnerService.executeTestCase(RunnerTestDTO(content, testCase.version, testCase.inputs, testCase.envs, testCase.output))
+        return runnerService.executeTestCase(
+            RunnerTestDTO(content, testCase.version, testCase.inputs, testCase.envs, testCase.output, snippet.language),
+        )
     }
 }
