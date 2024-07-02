@@ -1,12 +1,13 @@
 package austral.ingsis.snippetops.service
 
-import austral.ingsis.snippetops.dto.NewReaderForm
-import austral.ingsis.snippetops.dto.SnippetCreate
-import austral.ingsis.snippetops.dto.SnippetDTO
-import austral.ingsis.snippetops.dto.SnippetGetterForm
-import austral.ingsis.snippetops.dto.SnippetLocation
-import austral.ingsis.snippetops.dto.SnippetPermissionsCreate
-import austral.ingsis.snippetops.dto.SnippetPermissionsDTO
+import austral.ingsis.snippetops.dto.permissions.NewReaderForm
+import austral.ingsis.snippetops.dto.permissions.SnippetCreate
+import austral.ingsis.snippetops.dto.permissions.SnippetDTO
+import austral.ingsis.snippetops.dto.permissions.SnippetGetterForm
+import austral.ingsis.snippetops.dto.permissions.SnippetLocation
+import austral.ingsis.snippetops.dto.permissions.SnippetPermissionsCreate
+import austral.ingsis.snippetops.dto.permissions.SnippetPermissionsDTO
+import austral.ingsis.snippetops.dto.permissions.User
 import austral.ingsis.snippetops.repository.BucketRepository
 import org.apache.coyote.BadRequestException
 import org.springframework.beans.factory.annotation.Autowired
@@ -53,7 +54,7 @@ class SnippetService(
 
             if (permissionsResponse.body != null) {
                 val snippet = permissionsResponse.body as SnippetPermissionsDTO
-                val result = bucketRepository.save(snippet.id.toString(), snippet.container, body.content)
+                val result = bucketRepository.save(snippet.id.toString(), snippet.container, body.content, String::class.java)
                 if (result.isPresent) {
                     return if (result.get() == true) {
                         ResponseEntity(this.snippetDTO(snippet, result.toString()), HttpStatus.CREATED)
@@ -106,21 +107,18 @@ class SnippetService(
         userId: String,
     ): ResponseEntity<Boolean> {
         try {
-            // Check if the snippet exists
             val existingSnippet = this.getSnippet(id)
             if (existingSnippet.statusCode != HttpStatus.OK) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build()
             }
 
-            // Delete the existing snippet from the bucket
-            val snippet = existingSnippet.body
-            val deleteResponse = this.bucketRepository.delete(snippet?.id.toString(), "snippet")
-            if (!deleteResponse.isPresent) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build()
+            // if user is not the writer, return forbidden
+            if (existingSnippet.body?.user?.id != userId) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
             }
 
-            // Put the new snippet in the same place
-            val result = this.bucketRepository.save(snippet?.id.toString(), "snippet", body)
+            val snippet = existingSnippet.body
+            val result = this.bucketRepository.save(snippet?.id.toString(), "snippet", body, String::class.java)
             if (!result.isPresent) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build()
             }
@@ -147,7 +145,7 @@ class SnippetService(
                     ResponseEntity.status(ex.statusCode).build()
                 }
             val snippet = permissionResponse.body as SnippetPermissionsDTO
-            val content = this.bucketRepository.get(snippet.id.toString(), snippet.container)
+            val content = this.bucketRepository.get(snippet.id.toString(), snippet.container, String::class.java)
             return when {
                 content.isPresent ->
                     ResponseEntity.ok()
@@ -168,24 +166,14 @@ class SnippetService(
         try {
             val snippetGetterForm = SnippetGetterForm(userId, page, 10)
             val requestEntity = HttpEntity(snippetGetterForm)
-
-            val response =
+            val permissionsResponse =
                 restTemplate.exchange(
                     "$url/snippet/byWriter",
                     HttpMethod.POST,
                     requestEntity,
                     object : ParameterizedTypeReference<List<SnippetPermissionsDTO>>() {},
                 )
-            if (response.body != null) {
-                val responseBody = response.body
-                return when (response.statusCode) {
-                    HttpStatus.OK -> ResponseEntity(this.mapSnippetsIntoDtos(responseBody), HttpStatus.OK)
-                    HttpStatus.BAD_REQUEST -> ResponseEntity.badRequest().build()
-                    else -> ResponseEntity.notFound().build()
-                }
-            } else {
-                throw NullPointerException("Response body from permissions is null")
-            }
+            return this.generateGetterByResponse(permissionsResponse)
         } catch (e: NullPointerException) {
             return ResponseEntity(HttpStatus.CONFLICT)
         }
@@ -198,24 +186,14 @@ class SnippetService(
         try {
             val snippetGetterForm = SnippetGetterForm(userId, page, 10)
             val requestEntity = HttpEntity(snippetGetterForm)
-
-            val response =
+            val permissionsResponse =
                 restTemplate.exchange(
                     "$url/snippet/byReader",
                     HttpMethod.POST,
                     requestEntity,
                     object : ParameterizedTypeReference<List<SnippetPermissionsDTO>>() {},
                 )
-            if (response.body != null) {
-                val responseBody = response.body
-                return when (response.statusCode) {
-                    HttpStatus.OK -> ResponseEntity(this.mapSnippetsIntoDtos(responseBody), HttpStatus.OK)
-                    HttpStatus.BAD_REQUEST -> ResponseEntity.badRequest().build()
-                    else -> ResponseEntity.notFound().build()
-                }
-            } else {
-                throw NullPointerException("Response body from permissions is null")
-            }
+            return this.generateGetterByResponse(permissionsResponse)
         } catch (e: NullPointerException) {
             return ResponseEntity(HttpStatus.CONFLICT)
         }
@@ -228,24 +206,14 @@ class SnippetService(
         try {
             val snippetGetterForm = SnippetGetterForm(userId, page, 10)
             val requestEntity = HttpEntity(snippetGetterForm)
-
-            val response =
+            val permissionsResponse =
                 restTemplate.exchange(
                     "$url/snippet/byReaderAndWriter",
                     HttpMethod.POST,
                     requestEntity,
                     object : ParameterizedTypeReference<List<SnippetPermissionsDTO>>() {},
                 )
-            if (response.body != null) {
-                val responseBody = response.body
-                return when (response.statusCode) {
-                    HttpStatus.OK -> ResponseEntity(this.mapSnippetsIntoDtos(responseBody), HttpStatus.OK)
-                    HttpStatus.BAD_REQUEST -> ResponseEntity.badRequest().build()
-                    else -> ResponseEntity.notFound().build()
-                }
-            } else {
-                throw NullPointerException("Response body from permissions is null")
-            }
+            return this.generateGetterByResponse(permissionsResponse)
         } catch (e: NullPointerException) {
             return ResponseEntity(HttpStatus.CONFLICT)
         }
@@ -282,23 +250,6 @@ class SnippetService(
         }
     }
 
-    private fun snippetDTO(
-        snippet: SnippetPermissionsDTO,
-        content: String,
-    ): SnippetDTO {
-        return SnippetDTO(
-            snippet.id,
-            snippet.writer,
-            snippet.name,
-            snippet.language,
-            snippet.extension,
-            snippet.readers,
-            content,
-            snippet.creationDate,
-            snippet.updateDate,
-        )
-    }
-
     private fun checkCreateBody(body: SnippetCreate) {
         if (
             body.content.isBlank() || body.name.isBlank() || body.language.isBlank() || body.extension.isBlank()
@@ -320,14 +271,47 @@ class SnippetService(
         )
     }
 
+    private fun snippetDTO(
+        snippet: SnippetPermissionsDTO,
+        content: String,
+    ): SnippetDTO {
+        val user = this.userService.getUserById(snippet.writer)!!
+        val readers = mutableListOf<User>()
+        snippet.readers.forEach { r -> readers.add(this.userService.getUserById(r)!!) }
+        return SnippetDTO(
+            snippet.id,
+            user,
+            snippet.name,
+            snippet.language,
+            snippet.extension,
+            readers.toList(),
+            content,
+            snippet.creationDate,
+            snippet.updateDate,
+        )
+    }
+
     private fun mapSnippetsIntoDtos(snippets: List<SnippetPermissionsDTO>?): List<SnippetDTO> {
         val dtos = mutableListOf<SnippetDTO>()
         snippets?.forEach { s ->
-            val content = this.bucketRepository.get(s.id.toString(), s.container).get()
+            val content = this.bucketRepository.get(s.id.toString(), s.container, String::class.java).get()
             dtos.add(
                 this.snippetDTO(s, content.toString()),
             )
         }
         return dtos.toList()
+    }
+
+    private fun generateGetterByResponse(response: ResponseEntity<List<SnippetPermissionsDTO>>): ResponseEntity<List<SnippetDTO>> {
+        if (response.body != null) {
+            val responseBody = response.body
+            return when (response.statusCode) {
+                HttpStatus.OK -> ResponseEntity(this.mapSnippetsIntoDtos(responseBody), HttpStatus.OK)
+                HttpStatus.BAD_REQUEST -> ResponseEntity.badRequest().build()
+                else -> ResponseEntity.notFound().build()
+            }
+        } else {
+            throw NullPointerException("Response body from permissions is null")
+        }
     }
 }
