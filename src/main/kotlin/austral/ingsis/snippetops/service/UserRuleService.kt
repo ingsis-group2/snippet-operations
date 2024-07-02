@@ -13,8 +13,8 @@ class UserRuleService(
         userId: String,
         container: String,
     ): ResponseEntity<Map<*, *>> {
-        // remove the auth0| prefix from the userId to avoid issues with the bucket repository
-        val splicedId = extractAuth0UserId(userId)
+        // remove the prefix from the userId to avoid issues with the bucket repository
+        val splicedId = sliceUserId(userId)
         return try {
             val rules = bucketRepository.get(splicedId, container, Map::class.java)
             if (rules.isPresent) {
@@ -39,7 +39,7 @@ class UserRuleService(
         content: Map<String, Any>,
         container: String,
     ): ResponseEntity<Boolean> {
-        val splicedId = extractAuth0UserId(userId)
+        val splicedId = sliceUserId(userId)
         return try {
             val result = this.bucketRepository.save(splicedId, container, content, Map::class.java)
             if (result.isPresent) {
@@ -74,7 +74,7 @@ class UserRuleService(
         )
     }
 
-    private fun extractAuth0UserId(fullUserId: String): String {
-        return fullUserId.substringAfter("auth0|")
+    private fun sliceUserId(fullUserId: String): String {
+        return fullUserId.substringAfter("|")
     }
 }

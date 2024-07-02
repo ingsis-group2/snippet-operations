@@ -4,4 +4,5 @@ data class RunnerLintDTO(
     val content: String,
     val version: String,
     val lintRules: Map<String, Any>,
+    val language: String,
 )
