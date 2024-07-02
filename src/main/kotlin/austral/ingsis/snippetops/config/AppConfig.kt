@@ -1,7 +1,7 @@
 package austral.ingsis.snippetops.config
 
 import austral.ingsis.snippetops.repository.BucketRepository
-import austral.ingsis.snippetops.repository.SnippetBucketRepository
+import austral.ingsis.snippetops.repository.BucketRepositoryImpl
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
@@ -11,9 +11,6 @@ import org.springframework.web.client.RestTemplate
 
 @Configuration
 class AppConfig {
-    @Value("\${spring.services.snippet.bucket}")
-    lateinit var url: String
-
     @Bean
     fun restTemplate(): RestTemplate {
         return RestTemplateBuilder()
@@ -28,7 +25,10 @@ class AppConfig {
     }
 
     @Bean
-    fun bucketRepository(restTemplate: RestTemplate): BucketRepository {
-        return SnippetBucketRepository(url, restTemplate)
+    fun bucketRepository(
+        restTemplate: RestTemplate,
+        @Value("\${spring.services.snippet.bucket}") url: String,
+    ): BucketRepository {
+        return BucketRepositoryImpl(url, restTemplate)
     }
 }

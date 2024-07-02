@@ -1,5 +1,6 @@
 package austral.ingsis.snippetops.controller
 
+import austral.ingsis.snippetops.dto.operations.OperationsTestDTO
 import austral.ingsis.snippetops.dto.runner.execute.ExecutionDTO
 import austral.ingsis.snippetops.dto.runner.execute.ExecutionOutputDTO
 import austral.ingsis.snippetops.dto.runner.execute.RunnerExecutionDTO
@@ -9,8 +10,10 @@ import austral.ingsis.snippetops.dto.runner.format.RunnerFormatDTO
 import austral.ingsis.snippetops.dto.runner.lint.LintDTO
 import austral.ingsis.snippetops.dto.runner.lint.LintOutputDTO
 import austral.ingsis.snippetops.dto.runner.lint.RunnerLintDTO
+import austral.ingsis.snippetops.dto.runner.test.RunnerTestDTO
 import austral.ingsis.snippetops.service.RunnerService
 import austral.ingsis.snippetops.service.SnippetService
+import austral.ingsis.snippetops.service.TestCaseService
 import austral.ingsis.snippetops.service.UserRuleService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -28,6 +31,7 @@ class RunnerController(
     @Autowired val runnerService: RunnerService,
     @Autowired val snippetService: SnippetService,
     @Autowired val userRuleService: UserRuleService,
+    @Autowired val testCaseService: TestCaseService,
 ) {
     @PostMapping("/execute/{id}")
     suspend fun executeSnippet(
@@ -37,7 +41,7 @@ class RunnerController(
     ): ResponseEntity<ExecutionOutputDTO> {
         val snippet = snippetService.getSnippet(id).body ?: throw Exception("Snippet not found")
         val content = snippet.content
-        return runnerService.executeSnippet(RunnerExecutionDTO(content, body.version, body.inputs))
+        return runnerService.executeSnippet(RunnerExecutionDTO(content, body.version, body.inputs, snippet.language))
     }
 
     @PostMapping("/format/{id}")
@@ -53,7 +57,11 @@ class RunnerController(
 
         val rules = userRuleService.getUserRules(user.claims["sub"].toString(), "format")
         val unwrappedRules = rules.body ?: throw Exception("Rules not found")
-        return runnerService.formatSnippet(RunnerFormatDTO(content, body.version, unwrappedRules as Map<String, Any>), snippet, userId)
+        return runnerService.formatSnippet(
+            RunnerFormatDTO(content, body.version, unwrappedRules as Map<String, Any>, snippet.language),
+            snippet,
+            userId,
+        )
     }
 
     @PostMapping("/lint/{id}")
@@ -67,22 +75,20 @@ class RunnerController(
 
         val rules = userRuleService.getUserRules(user.claims["sub"].toString(), "lint")
         val unwrappedRules = rules.body ?: throw Exception("Rules not found")
-        return runnerService.lintSnippet(RunnerLintDTO(content, body.version, unwrappedRules as Map<String, Any>))
+        return runnerService.lintSnippet(RunnerLintDTO(content, body.version, unwrappedRules as Map<String, Any>, snippet.language))
     }
 
-    @PostMapping("/test/{id}")
+    @PostMapping("/test/{testId}")
     suspend fun test(
-        @PathVariable id: String,
+        @PathVariable testId: String,
         @RequestBody version: String,
         @AuthenticationPrincipal user: Jwt,
     ): ResponseEntity<Boolean> {
-        // val testCase = testCaseService.getTestCase(id).body ?: throw Exception("Test not found")
-        // looks for the snippet from the test
-        // val snippet = snippetService.getSnippet(testCase.snippetId).body ?: throw Exception("Snippet not found")
-
-//        return runnerService.executeTestCase(
-//            RunnerTestCaseDTO(snippet.content, version, testCase.inputs, testCase.envs, testCase.expectedOutput),
-//        )
-        return ResponseEntity.ok(true)
+        val testCase = testCaseService.getTestCase(testId).body as OperationsTestDTO
+        val snippet = snippetService.getSnippet(testCase.snippetId).body ?: throw Exception("Snippet not found")
+        val content = snippet.content
+        return runnerService.executeTestCase(
+            RunnerTestDTO(content, testCase.version, testCase.inputs, testCase.envs, testCase.output, snippet.language),
+        )
     }
 }

@@ -9,17 +9,18 @@ import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 import java.util.Optional
 
-class SnippetBucketRepository(
+class BucketRepositoryImpl(
     private val url: String,
     private val restTemplate: RestTemplate,
 ) : BucketRepository {
-    override fun get(
+    override fun <T> get(
         key: String,
         container: String,
+        expectedType: Class<T>,
     ): Optional<Any> {
         val url = buildUrl(key, container)
         return try {
-            val response = restTemplate.exchange(url, HttpMethod.GET, null, String::class.java)
+            val response = restTemplate.exchange(url, HttpMethod.GET, null, expectedType)
             return when (response.statusCode) {
                 HttpStatus.OK -> {
                     println(response.body)
@@ -32,11 +33,16 @@ class SnippetBucketRepository(
         }
     }
 
-    override fun save(
+    override fun <T> save(
         key: String,
         container: String,
-        content: String,
+        content: Any,
+        type: Class<T>,
     ): Optional<Any> {
+        val asset = this.get(key, container, type)
+        if (asset.isPresent) { // if is not present, then is
+            this.delete(key, container)
+        }
         val headers =
             HttpHeaders().apply {
                 contentType = MediaType.APPLICATION_JSON
@@ -57,42 +63,6 @@ class SnippetBucketRepository(
         } catch (e: Exception) {
             Optional.empty()
         }
-    }
-
-    override fun getRules(
-        key: String,
-        container: String,
-    ): Optional<Any> {
-        val url = buildUrl(key, container)
-        return try {
-            val response = restTemplate.exchange(url, HttpMethod.GET, null, Map::class.java)
-            return when (response.statusCode) {
-                HttpStatus.OK -> {
-                    println(response.body)
-                    return response.body?.let { Optional.of(it) }!!
-                }
-                else -> Optional.empty()
-            }
-        } catch (e: Exception) {
-            Optional.empty()
-        }
-    }
-
-    override fun saveRules(
-        key: String,
-        container: String,
-        content: Map<String, Any>,
-    ): Optional<Any> {
-        val headers =
-            HttpHeaders().apply {
-                contentType = MediaType.APPLICATION_JSON
-            }
-        val requestEntity = HttpEntity(content, headers)
-
-        // First, delete the existing rules
-        delete(key, container)
-
-        return post(container, key, requestEntity)
     }
 
     private fun post(

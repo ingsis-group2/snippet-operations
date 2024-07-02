@@ -7,16 +7,16 @@ import org.springframework.stereotype.Service
 
 @Service
 class UserRuleService(
-    @Autowired private val bucketRepository: BucketRepository,
+    @Autowired val bucketRepository: BucketRepository,
 ) {
     fun getUserRules(
         userId: String,
         container: String,
     ): ResponseEntity<Map<*, *>> {
-        // remove the auth0| prefix from the userId to avoid issues with the bucket repository
-        val splicedId = extractAuth0UserId(userId)
+        // remove the prefix from the userId to avoid issues with the bucket repository
+        val splicedId = sliceUserId(userId)
         return try {
-            val rules = bucketRepository.getRules(splicedId, container)
+            val rules = bucketRepository.get(splicedId, container, Map::class.java)
             if (rules.isPresent) {
                 ResponseEntity.ok().body(rules.get() as Map<*, *>)
             } else {
@@ -26,7 +26,7 @@ class UserRuleService(
                     } else {
                         defaultFormattingRules()
                     }
-                bucketRepository.saveRules(splicedId, container, defaultRules)
+                bucketRepository.save(splicedId, container, defaultRules, Map::class.java)
                 ResponseEntity.ok().body(defaultRules)
             }
         } catch (e: Exception) {
@@ -39,9 +39,9 @@ class UserRuleService(
         content: Map<String, Any>,
         container: String,
     ): ResponseEntity<Boolean> {
-        val splicedId = extractAuth0UserId(userId)
+        val splicedId = sliceUserId(userId)
         return try {
-            val result = this.bucketRepository.saveRules(splicedId, container, content)
+            val result = this.bucketRepository.save(splicedId, container, content, Map::class.java)
             if (result.isPresent) {
                 if (result.get() == true) {
                     ResponseEntity.status(201).build()
@@ -74,7 +74,7 @@ class UserRuleService(
         )
     }
 
-    private fun extractAuth0UserId(fullUserId: String): String {
-        return fullUserId.substringAfter("auth0|")
+    private fun sliceUserId(fullUserId: String): String {
+        return fullUserId.substringAfter("|")
     }
 }
