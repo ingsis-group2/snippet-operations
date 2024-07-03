@@ -1,6 +1,5 @@
 package austral.ingsis.snippetops
 
-import io.github.cdimascio.dotenv.Dotenv
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
@@ -8,9 +7,5 @@ import org.springframework.boot.runApplication
 class SnippetOpsApplication
 
 fun main(args: Array<String>) {
-    val dotenv = Dotenv.load()
-    dotenv.entries().forEach { entry ->
-        System.setProperty(entry.key, entry.value)
-    }
     runApplication<SnippetOpsApplication>(*args)
 }
