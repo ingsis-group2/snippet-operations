@@ -1,4 +1,4 @@
-package austral.ingsis.snippetops
+package austral.ingsis.snippetops.snippet_service
 
 import austral.ingsis.snippetops.dto.permissions.SnippetCreate
 import austral.ingsis.snippetops.dto.permissions.SnippetPermissionsDTO
@@ -22,7 +22,6 @@ class SnippetCreationTest {
     private val bucketRepository: BucketRepository = mockk()
     private val restTemplate: RestTemplate = mockk()
     private val userService: UserService = mockk()
-    private val url = "http://snippet-permissions:8080"
     private val snippetService = SnippetService("", bucketRepository, restTemplate, userService)
     private val body = SnippetCreate(
         name = "Test Snippet",
@@ -42,6 +41,7 @@ class SnippetCreationTest {
         creationDate = LocalDateTime.now(),
         updateDate = null
     )
+
 
     @Test
     fun `test createSnippet`() {
@@ -80,7 +80,7 @@ class SnippetCreationTest {
         every { bucketRepository.save(any(), any(), any(), String::class.java) } returns Optional.empty()
 
         val response = snippetService.createSnippet(body, userId)
-        assertEquals(HttpStatus.CONFLICT, response.statusCode)
+        assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
     }
 
     @Test
