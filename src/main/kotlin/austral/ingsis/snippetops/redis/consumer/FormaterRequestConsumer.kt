@@ -12,30 +12,29 @@ import java.time.Duration
 
 @Component
 @Profile("!test")
-class LinterConsumer
+class FormaterRequestConsumer
     @Autowired
     constructor(
         redis: RedisTemplate<String, String>,
         @Value("\${redis.stream.request_linter_result_key}") streamKey: String,
         @Value("\${redis.groups.lint_result}") groupId: String,
-    ) : RedisStreamConsumer<LintResultEvent>(streamKey, groupId, redis) {
+    ) : RedisStreamConsumer<FormatResult>(streamKey, groupId, redis) {
         init {
             subscription()
         }
 
-        override fun options(): StreamReceiver.StreamReceiverOptions<String, ObjectRecord<String, LintResultEvent>> =
+        override fun options(): StreamReceiver.StreamReceiverOptions<String, ObjectRecord<String, FormatResult>> =
             StreamReceiver.StreamReceiverOptions
                 .builder()
                 .pollTimeout(Duration.ofMillis(10000)) // Set poll rate
-                .targetType(LintResultEvent::class.java) // Set type to de-serialize record
+                .targetType(FormatResult::class.java) // Set type to de-serialize record
                 .build()
 
-        override fun onMessage(record: ObjectRecord<String, LintResultEvent>) {
+        override fun onMessage(record: ObjectRecord<String, FormatResult>) {
         }
     }
 
-data class LintResultEvent(
+data class FormatResult(
     val snippetId: Long,
-    val reportList: List<String>,
-    val errorList: List<String>,
+    val formattedSnippet: String,
 )

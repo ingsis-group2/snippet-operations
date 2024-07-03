@@ -52,8 +52,9 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
 
-    implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
-    implementation("org.austral.ingsis:redis-streams-flux:0.1.13")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.austral.ingsis:redis-streams-mvc:0.1.13")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive:+")
 }
 
 tasks.withType<KotlinCompile> {
