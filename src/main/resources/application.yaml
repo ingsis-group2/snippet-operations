@@ -32,3 +32,17 @@ okta:
 
 server:
   port: 8081
+
+redis:
+  host: redis
+  port: 6379
+  stream:
+    request_linter_key: lintingStream
+    request_formater_key: formatingStream
+    request_linter_result_key: lintingResultStream
+    request_format_result_key: formatingResultStream
+  groups:
+    lint: lintSnippetsOnRuleChange
+    format: formatSnippetsOnRuleChange
+    lint_result: lintSnippetOnResultChange
+    format_result: formatSnippetOnResultChange
