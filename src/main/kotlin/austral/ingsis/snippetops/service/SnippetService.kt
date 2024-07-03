@@ -9,6 +9,7 @@ import austral.ingsis.snippetops.dto.permissions.SnippetLintStatusDTO
 import austral.ingsis.snippetops.dto.permissions.SnippetLocation
 import austral.ingsis.snippetops.dto.permissions.SnippetPermissionsCreate
 import austral.ingsis.snippetops.dto.permissions.SnippetPermissionsDTO
+import austral.ingsis.snippetops.dto.permissions.UpdateLintStatusDTO
 import austral.ingsis.snippetops.dto.permissions.User
 import austral.ingsis.snippetops.repository.BucketRepository
 import org.apache.coyote.BadRequestException
@@ -156,35 +157,32 @@ class SnippetService(
     fun getSnippetByWriter(
         userId: String,
         page: Int,
-    ): ResponseEntity<List<SnippetDTO>> {
-        return this.getSnippetBySomeone(
+    ): ResponseEntity<List<SnippetDTO>> =
+        this.getSnippetBySomeone(
             "$url/snippet/byWriter",
             userId,
             page,
         )
-    }
 
     fun getSnippetByReader(
         userId: String,
         page: Int,
-    ): ResponseEntity<List<SnippetDTO>> {
-        return this.getSnippetBySomeone(
+    ): ResponseEntity<List<SnippetDTO>> =
+        this.getSnippetBySomeone(
             "$url/snippet/byReader",
             userId,
             page,
         )
-    }
 
     fun getSnippetByReaderAndWriter(
         userId: String,
         page: Int,
-    ): ResponseEntity<List<SnippetDTO>> {
-        return this.getSnippetBySomeone(
+    ): ResponseEntity<List<SnippetDTO>> =
+        this.getSnippetBySomeone(
             "$url/snippet/byReaderAndWriter",
             userId,
             page,
         )
-    }
 
     fun getSnippetLintStatus(snippetId: Long): ResponseEntity<SnippetLintStatusDTO> {
         try {
@@ -244,7 +242,7 @@ class SnippetService(
         }
     }
 
-    fun updateSnippetLintStatus(updateLintStatusDTO: SnippetLintStatusDTO): ResponseEntity<SnippetLintStatusDTO> {
+    fun updateSnippetLintStatus(updateLintStatusDTO: UpdateLintStatusDTO): ResponseEntity<SnippetLintStatusDTO> {
         try {
             val requestEntity = HttpEntity(updateLintStatusDTO)
             val response =
@@ -325,14 +323,13 @@ class SnippetService(
         method: HttpMethod,
         request: HttpEntity<*>?,
         typeExpected: Class<T>,
-    ): ResponseEntity<T> {
-        return restTemplate.exchange(
+    ): ResponseEntity<T> =
+        restTemplate.exchange(
             url,
             method,
             request,
             typeExpected,
         )
-    }
 
     private fun getSnippetBySomeone(
         url: String,
