@@ -1,11 +1,12 @@
 package austral.ingsis.snippetops.service
 
-import austral.ingsis.snippetops.dto.SnippetDTO
+import austral.ingsis.snippetops.dto.permissions.SnippetDTO
 import austral.ingsis.snippetops.redis.producer.FormaterRequest
 import austral.ingsis.snippetops.redis.producer.FormatterRequestProducer
 import austral.ingsis.snippetops.redis.producer.LintRequest
 import austral.ingsis.snippetops.redis.producer.LintRequestProducer
 import austral.ingsis.snippetops.repository.BucketRepository
+import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -89,11 +90,12 @@ class UserRuleService(
             val lintRequest =
                 LintRequest(
                     it.id,
-                    "1.1",
                     it.content,
                     lintingRules,
                 )
-            lintRequestProducer.publishLintRequest(lintRequest)
+            runBlocking {
+                lintRequestProducer.publishLintRequest(lintRequest)
+            }
         }
     }
 
@@ -106,29 +108,30 @@ class UserRuleService(
             val formatRequest =
                 FormaterRequest(
                     it.id,
-                    it.extension,
                     it.content,
                     formatRules,
                 )
-            formaterRequestProducer.publishFormatRequest(formatRequest)
+            runBlocking {
+                formaterRequestProducer.publishFormatRequest(formatRequest)
+            }
         }
     }
 
     private fun sliceUserId(fullUserId: String): String {
         return fullUserId.substringAfter("|")
-        private fun getWriterSnippets(userId: String): List<SnippetDTO> {
-            var snippetPageCounter = 0
-            var snippets = mutableListOf<SnippetDTO>()
-            while (true) {
-                val snippetPage = snippetService.getSnippetByWriter(userId, snippetPageCounter)
-                if (snippetPage.body == null || snippetPage.body!!.isEmpty()) {
-                    break
-                }
-                snippets.addAll(snippetPage.body!!)
-                snippetPageCounter++
-            }
-            return snippets
-        }
-
-        private fun extractAuth0UserId(fullUserId: String): String = fullUserId.substringAfter("auth0|")
     }
+
+    private fun getWriterSnippets(userId: String): List<SnippetDTO> {
+        var snippetPageCounter = 0
+        var snippets = mutableListOf<SnippetDTO>()
+        while (true) {
+            val snippetPage = snippetService.getSnippetByWriter(userId, snippetPageCounter)
+            if (snippetPage.body == null || snippetPage.body!!.isEmpty()) {
+                break
+            }
+            snippets.addAll(snippetPage.body!!)
+            snippetPageCounter++
+        }
+        return snippets
+    }
+}
