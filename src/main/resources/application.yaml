@@ -17,6 +17,20 @@ spring:
       permissions: http://snippet-permissions:8080
       runner: http://snippet-runner:8080
       bucket: http://asset_service:8080/v1/asset
+  data:
+    redis:
+      host: redis
+      port: 6379
+      stream:
+        request_linter_key: lintingStream
+        request_formater_key: formatingStream
+        request_linter_result_key: lintingResultStream
+        request_format_result_key: formatingResultStream
+      groups:
+        lint: lintSnippetsOnRuleChange
+        format: formatSnippetsOnRuleChange
+        lint_result: lintSnippetOnResultChange
+        format_result: formatSnippetOnResultChange
 
 okta:
   oauth2:
@@ -33,17 +47,5 @@ okta:
 server:
   port: 8081
 
-redis:
-  host: redis
-  port: 6379
-  stream:
-    request_linter_key: lintingStream
-    request_formater_key: formatingStream
-    request_linter_result_key: lintingResultStream
-    request_format_result_key: formatingResultStream
-  groups:
-    lint: lintSnippetsOnRuleChange
-    format: formatSnippetsOnRuleChange
-    lint_result: lintSnippetOnResultChange
-    format_result: formatSnippetOnResultChange
+
 

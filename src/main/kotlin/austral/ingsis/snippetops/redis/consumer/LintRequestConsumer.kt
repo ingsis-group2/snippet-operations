@@ -1,5 +1,7 @@
 package austral.ingsis.snippetops.redis.consumer
 
+import austral.ingsis.snippetops.dto.permissions.UpdateLintStatusDTO
+import austral.ingsis.snippetops.service.SnippetService
 import org.austral.ingsis.redis.RedisStreamConsumer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -16,8 +18,9 @@ class LinterConsumer
     @Autowired
     constructor(
         redis: RedisTemplate<String, String>,
-        @Value("\${redis.stream.request_linter_result_key}") streamKey: String,
-        @Value("\${redis.groups.lint_result}") groupId: String,
+        @Value("\${spring.data.redis.stream.request_linter_result_key}") streamKey: String,
+        @Value("\${spring.data.redis.groups.lint_result}") groupId: String,
+        private val snippetService: SnippetService,
     ) : RedisStreamConsumer<LintResultEvent>(streamKey, groupId, redis) {
         init {
             subscription()
@@ -31,6 +34,10 @@ class LinterConsumer
                 .build()
 
         override fun onMessage(record: ObjectRecord<String, LintResultEvent>) {
+            println("message received on linter result stream: ${record.value}")
+            snippetService.updateSnippetLintStatus(
+                UpdateLintStatusDTO(record.value.snippetId, record.value.reportList, record.value.errorList),
+            )
         }
     }
 

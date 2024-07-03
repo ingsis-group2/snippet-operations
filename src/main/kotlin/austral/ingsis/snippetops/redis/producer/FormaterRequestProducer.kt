@@ -13,7 +13,7 @@ class
 FormatterRequestProducer
     @Autowired
     constructor(
-        @Value("\${redis.stream.request_formater_key}") streamKey: String,
+        @Value("\${spring.data.redis.stream.request_formater_key}") streamKey: String,
         redis: RedisTemplate<String, String>,
     ) : RedisStreamProducer(streamKey, redis) {
         suspend fun publishFormatRequest(event: FormaterRequest) {

@@ -14,9 +14,9 @@ import org.springframework.stereotype.Service
 @Service
 class UserRuleService(
     @Autowired val bucketRepository: BucketRepository,
-    private val snippetService: SnippetService,
-    private val lintRequestProducer: LintRequestProducer,
-    private val formaterRequestProducer: FormatterRequestProducer,
+    @Autowired private val snippetService: SnippetService,
+    @Autowired private val lintRequestProducer: LintRequestProducer,
+    @Autowired private val formaterRequestProducer: FormatterRequestProducer,
 ) {
     fun getUserRules(
         userId: String,
@@ -117,9 +117,7 @@ class UserRuleService(
         }
     }
 
-    private fun sliceUserId(fullUserId: String): String {
-        return fullUserId.substringAfter("|")
-    }
+    private fun sliceUserId(fullUserId: String): String = fullUserId.substringAfter("|")
 
     private fun getWriterSnippets(userId: String): List<SnippetDTO> {
         var snippetPageCounter = 0
