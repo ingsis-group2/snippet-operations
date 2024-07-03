@@ -16,8 +16,8 @@ class LinterConsumer
     @Autowired
     constructor(
         redis: RedisTemplate<String, String>,
-        @Value("\${redis.stream.request_linter_result_key}") streamKey: String,
-        @Value("\${redis.groups.lint_result}") groupId: String,
+        @Value("\${spring.data.redis.stream.request_linter_result_key}") streamKey: String,
+        @Value("\${spring.data.redis.groups.lint_result}") groupId: String,
     ) : RedisStreamConsumer<LintResultEvent>(streamKey, groupId, redis) {
         init {
             subscription()
