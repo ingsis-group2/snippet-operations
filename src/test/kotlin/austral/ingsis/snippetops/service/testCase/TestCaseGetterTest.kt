@@ -5,8 +5,7 @@ import austral.ingsis.snippetops.repository.BucketRepository
 import austral.ingsis.snippetops.service.TestCaseService
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import java.util.Optional
@@ -17,6 +16,7 @@ class TestCaseGetterTest {
     private val bucketRepository: BucketRepository = mockk()
     private val testCaseService = TestCaseService(bucketRepository)
     private val snippetId = 1L
+    private val userId = "auth0|123456789"
     private val testCaseContainer = "test"
     private val alreadyExistedTestCase = OperationsTestDTO(
         id = UUID.randomUUID().toString(),
@@ -51,5 +51,22 @@ class TestCaseGetterTest {
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
         val responseBody = response.body
         assertNull(responseBody)
+    }
+
+    @Test
+    fun `should success with status OK getting all test cases form user by it's id`() {
+        val slicedId = userId.substring(6, userId.length)
+        every {
+            bucketRepository.get(slicedId, "test-case-id", List::class.java)
+        } returns Optional.of(listOf(alreadyExistedTestCase.id))
+        every {
+            bucketRepository.get(alreadyExistedTestCase.id, testCaseContainer, OperationsTestDTO::class.java)
+        } returns Optional.of(alreadyExistedTestCase)
+
+        val response = this.testCaseService.getAllTestsCasesFromUser(userId)
+        assertEquals(HttpStatus.OK, response.statusCode)
+        val responseBody = response.body as List<OperationsTestDTO>
+        assertNotNull(responseBody)
+        assertEquals(responseBody.get(0).id, alreadyExistedTestCase.id)
     }
 }
