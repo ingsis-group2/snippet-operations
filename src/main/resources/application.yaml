@@ -32,3 +32,18 @@ okta:
 
 server:
   port: 8081
+
+
+redis:
+  host: ${REDIS_HOST}
+  port: ${REDIS_PORT}
+  stream:
+    request_linter_key: ${REDIS_STREAM_LINTER_KEY}
+    request_formater_key: ${REDIS_STREAM_FORMATER_KEY}
+    request_linter_result_key: ${REDIS_STREAM_LINTER_RESULT_KEY}
+    request_format_result_key: ${REDIS_STREAM_FORMAT_RESULT_KEY}
+  groups:
+    lint: ${REDIS_GROUPS_LINT}
+    format: ${REDIS_GROUPS_FORMAT}
+    lint_result: ${REDIS_GROUPS_LINT_RESULT}
+    format_result: ${REDIS_GROUPS_FORMAT_RESULT}
