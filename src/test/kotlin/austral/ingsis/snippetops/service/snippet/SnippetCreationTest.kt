@@ -1,4 +1,4 @@
-package austral.ingsis.snippetops.snippet_service
+package austral.ingsis.snippetops.service.snippet
 
 import austral.ingsis.snippetops.dto.permissions.SnippetCreate
 import austral.ingsis.snippetops.dto.permissions.SnippetPermissionsDTO
