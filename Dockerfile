@@ -1,4 +1,11 @@
 FROM gradle:8.7.0-jdk17
+
+ARG GITHUB_ACTOR
+ARG GITHUB_TOKEN
+
+ENV USERNAME ${GITHUB_ACTOR}
+ENV TOKEN ${GITHUB_TOKEN}
+
 RUN mkdir -p /usr/local/newrelic
 ADD ./newrelic/newrelic.jar /usr/local/newrelic/newrelic.jar
 ADD ./newrelic/newrelic.yml /usr/local/newrelic/newrelic.yml

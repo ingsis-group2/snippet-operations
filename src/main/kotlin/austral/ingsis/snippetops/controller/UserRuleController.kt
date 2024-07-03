@@ -26,12 +26,16 @@ class UserRuleController(
     }
 
     @PostMapping("/lint")
-    fun saveUserRules(
+    suspend fun saveUserRules(
         @AuthenticationPrincipal user: Jwt,
         @RequestBody rules: Map<String, Any>,
     ): ResponseEntity<Boolean> {
         val userId = user.claims["sub"].toString()
-        return userRuleService.saveUserRules(userId, rules, "lint")
+        val response = userRuleService.saveUserRules(userId, rules, "lint")
+        if (response.statusCode.is2xxSuccessful) {
+            userRuleService.publishLintStream(userId, rules)
+        }
+        return response
     }
 
     @GetMapping("/format")
@@ -44,11 +48,15 @@ class UserRuleController(
     }
 
     @PostMapping("/format")
-    fun saveUserFormattingRules(
+    suspend fun saveUserFormattingRules(
         @AuthenticationPrincipal user: Jwt,
         @RequestBody rules: Map<String, Any>,
     ): ResponseEntity<Boolean> {
         val userId = user.claims["sub"].toString()
-        return userRuleService.saveUserRules(userId, rules, "format")
+        val response = userRuleService.saveUserRules(userId, rules, "format")
+        if (response.statusCode.is2xxSuccessful) {
+            userRuleService.publishFormatStream(userId, rules)
+        }
+        return response
     }
 }
