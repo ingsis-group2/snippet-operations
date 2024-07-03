@@ -6,4 +6,5 @@ data class RunnerTestDTO(
     val inputs: List<String>,
     val envs: Map<String, Any>,
     val expectedOutput: List<String>,
+    val language: String,
 )

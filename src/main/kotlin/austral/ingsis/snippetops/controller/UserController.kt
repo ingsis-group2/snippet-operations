@@ -1,32 +1,27 @@
-package austral.ingsis.snippetperms.controller
+package austral.ingsis.snippetops.controller
 
+import austral.ingsis.snippetops.dto.permissions.User
+import austral.ingsis.snippetops.service.UserService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
-import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 
-@Controller
-class UserController {
-    @GetMapping("/")
-    @ResponseBody
-    fun index(): String {
-        return "I'm Alive!"
-    }
-
-    @GetMapping("/userId")
-    @ResponseBody
-    fun id(
+@RestController
+@RequestMapping("/user")
+class UserController(
+    @Autowired val userService: UserService,
+) {
+    @GetMapping
+    fun getAllUsers(
         @AuthenticationPrincipal user: Jwt,
-    ): Any? {
-        return user.claims["sub"]
-    }
-
-    @GetMapping("/jwt")
-    @ResponseBody
-    fun jwt(
-        @AuthenticationPrincipal jwt: Jwt,
-    ): String {
-        return jwt.tokenValue
+        @RequestParam page: Int = 0,
+        @RequestParam size: Int = 10,
+    ): ResponseEntity<List<User>> {
+        return ResponseEntity.ok(userService.getAllUsers(page, size))
     }
 }
