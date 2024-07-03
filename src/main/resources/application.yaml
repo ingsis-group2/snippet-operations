@@ -46,3 +46,4 @@ redis:
     format: formatSnippetsOnRuleChange
     lint_result: lintSnippetOnResultChange
     format_result: formatSnippetOnResultChange
+
