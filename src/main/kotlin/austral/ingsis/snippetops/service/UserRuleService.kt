@@ -116,19 +116,19 @@ class UserRuleService(
 
     private fun sliceUserId(fullUserId: String): String {
         return fullUserId.substringAfter("|")
-    private fun getWriterSnippets(userId: String): List<SnippetDTO> {
-        var snippetPageCounter = 0
-        var snippets = mutableListOf<SnippetDTO>()
-        while (true) {
-            val snippetPage = snippetService.getSnippetByWriter(userId, snippetPageCounter)
-            if (snippetPage.body == null || snippetPage.body!!.isEmpty()) {
-                break
+        private fun getWriterSnippets(userId: String): List<SnippetDTO> {
+            var snippetPageCounter = 0
+            var snippets = mutableListOf<SnippetDTO>()
+            while (true) {
+                val snippetPage = snippetService.getSnippetByWriter(userId, snippetPageCounter)
+                if (snippetPage.body == null || snippetPage.body!!.isEmpty()) {
+                    break
+                }
+                snippets.addAll(snippetPage.body!!)
+                snippetPageCounter++
             }
-            snippets.addAll(snippetPage.body!!)
-            snippetPageCounter++
+            return snippets
         }
-        return snippets
-    }
 
-    private fun extractAuth0UserId(fullUserId: String): String = fullUserId.substringAfter("auth0|")
-}
+        private fun extractAuth0UserId(fullUserId: String): String = fullUserId.substringAfter("auth0|")
+    }

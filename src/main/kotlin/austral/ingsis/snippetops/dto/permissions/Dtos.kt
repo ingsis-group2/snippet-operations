@@ -58,7 +58,6 @@ data class NewReaderForm(
     val readerId: String,
 )
 
-data class SnippetUpdateDTO(val content: String)
 data class SnippetUpdateDTO(
     val content: String,
 )

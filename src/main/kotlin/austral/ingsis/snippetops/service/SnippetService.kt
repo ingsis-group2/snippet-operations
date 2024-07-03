@@ -1,21 +1,15 @@
 package austral.ingsis.snippetops.service
 
+import austral.ingsis.snippetops.dto.permissions.LintStatusForm
 import austral.ingsis.snippetops.dto.permissions.NewReaderForm
 import austral.ingsis.snippetops.dto.permissions.SnippetCreate
 import austral.ingsis.snippetops.dto.permissions.SnippetDTO
 import austral.ingsis.snippetops.dto.permissions.SnippetGetterForm
+import austral.ingsis.snippetops.dto.permissions.SnippetLintStatusDTO
 import austral.ingsis.snippetops.dto.permissions.SnippetLocation
 import austral.ingsis.snippetops.dto.permissions.SnippetPermissionsCreate
 import austral.ingsis.snippetops.dto.permissions.SnippetPermissionsDTO
 import austral.ingsis.snippetops.dto.permissions.User
-import austral.ingsis.snippetops.dto.LintStatusForm
-import austral.ingsis.snippetops.dto.SnippetCreate
-import austral.ingsis.snippetops.dto.SnippetDTO
-import austral.ingsis.snippetops.dto.SnippetGetterForm
-import austral.ingsis.snippetops.dto.SnippetLintStatusDTO
-import austral.ingsis.snippetops.dto.SnippetLocation
-import austral.ingsis.snippetops.dto.SnippetPermissionsCreate
-import austral.ingsis.snippetops.dto.SnippetPermissionsDTO
 import austral.ingsis.snippetops.repository.BucketRepository
 import org.apache.coyote.BadRequestException
 import org.springframework.beans.factory.annotation.Autowired
@@ -286,7 +280,7 @@ class SnippetService(
         }
     }
 
-    fun updateSnippetLintStatus(updateLintStatusDTO: SnippetLintStatusDTO): ResponseEntity<SnippetLintStatusDTO>  {
+    fun updateSnippetLintStatus(updateLintStatusDTO: SnippetLintStatusDTO): ResponseEntity<SnippetLintStatusDTO> {
         try {
             val requestEntity = HttpEntity(updateLintStatusDTO)
             val response =
@@ -310,22 +304,6 @@ class SnippetService(
             return ResponseEntity(HttpStatus.CONFLICT)
         }
     }
-
-    private fun snippetDTO(
-        snippet: SnippetPermissionsDTO,
-        content: String,
-    ): SnippetDTO =
-        SnippetDTO(
-            snippet.id,
-            snippet.writer,
-            snippet.name,
-            snippet.language,
-            snippet.extension,
-            snippet.readers,
-            content,
-            snippet.creationDate,
-            snippet.updateDate,
-        )
 
     private fun checkCreateBody(body: SnippetCreate) {
         if (
