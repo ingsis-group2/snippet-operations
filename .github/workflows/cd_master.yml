@@ -33,6 +33,9 @@ jobs:
           push: true
           no-cache: true
           tags: ghcr.io/ingsis-group2/snippet-operations-master:latest
+          build-args: |
+            GITHUB_ACTOR=${{ github.actor }}
+            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
       - name: Deploy to VM
         uses: appleboy/ssh-action@master
         with:
