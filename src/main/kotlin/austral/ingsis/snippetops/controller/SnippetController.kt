@@ -2,6 +2,7 @@ package austral.ingsis.snippetops.controller
 
 import austral.ingsis.snippetops.dto.permissions.SnippetCreate
 import austral.ingsis.snippetops.dto.permissions.SnippetDTO
+import austral.ingsis.snippetops.dto.permissions.SnippetLintStatusDTO
 import austral.ingsis.snippetops.dto.permissions.SnippetUpdateDTO
 import austral.ingsis.snippetops.service.SnippetService
 import org.springframework.beans.factory.annotation.Autowired
@@ -83,6 +84,14 @@ class SnippetController(
     ): ResponseEntity<List<SnippetDTO>> {
         val userId = user.claims["sub"]
         return this.snippetService.getSnippetByReaderAndWriter(userId.toString(), page)
+    }
+
+    @GetMapping("/status/{id}")
+    fun getSnippetStatus(
+        @PathVariable("id") id: Long,
+        @AuthenticationPrincipal user: Jwt,
+    ): ResponseEntity<SnippetLintStatusDTO> {
+        return this.snippetService.getSnippetLintStatus(id)
     }
 
     @DeleteMapping("/{id}")

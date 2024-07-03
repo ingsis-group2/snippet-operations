@@ -17,7 +17,16 @@ java {
 }
 
 repositories {
+    gradlePluginPortal()
     mavenCentral()
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/austral-ingsis/class-redis-stream")
+        credentials {
+            username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+            password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+        }
+    }
 }
 
 dependencies {
@@ -42,6 +51,9 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.3")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
+
+    implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
+    implementation("org.austral.ingsis:redis-streams-flux:0.1.13")
 }
 
 tasks.withType<KotlinCompile> {

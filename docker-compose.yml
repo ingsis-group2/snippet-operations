@@ -12,3 +12,9 @@ services:
       - .env
     environment:
       - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_KEY}
+
+  redis:
+    container_name: "redis"
+    image: redis:6-alpine
+    ports:
+        - "6379:6379"

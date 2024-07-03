@@ -26,7 +26,10 @@ data class SnippetDTO(
     val updateDate: LocalDateTime?,
 )
 
-data class SnippetLocation(val id: Long, val container: String)
+data class SnippetLocation(
+    val id: Long,
+    val container: String,
+)
 
 data class SnippetCreate(
     val name: String,
@@ -55,7 +58,25 @@ data class NewReaderForm(
     val readerId: String,
 )
 
-data class SnippetUpdateDTO(val content: String)
+data class SnippetUpdateDTO(
+    val content: String,
+)
+
+data class LintStatusForm(
+    val snippetId: Long,
+)
+
+data class SnippetLintStatusDTO(
+    val id: Long,
+    val snippetId: Long,
+    val status: String,
+)
+
+data class UpdateLintStatusDTO(
+    val snippetId: Long,
+    val reportList: List<String>,
+    val errorList: List<String>,
+)
 
 data class User(
     val id: String,
