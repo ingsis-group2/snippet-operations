@@ -9,7 +9,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class
-FormatterRequestProducer@Autowired
+FormatterRequestProducer
+    @Autowired
     constructor(
         @Value("\${redis.stream.request_formater_key}") streamKey: String,
         redis: ReactiveRedisTemplate<String, String>,
