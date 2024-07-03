@@ -22,7 +22,6 @@ class LintRequestProducer
 
 data class LintRequest(
     val snippetId: Long,
-    val version: String,
     val snippetContent: String,
     val lintRules: Map<String, Any>,
 )

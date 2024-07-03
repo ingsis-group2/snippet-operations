@@ -88,7 +88,7 @@ class UserRuleService(
             val lintRequest =
                 LintRequest(
                     it.id,
-                    it.extension,
+                    "1.1",
                     it.content,
                     lintingRules,
                 )

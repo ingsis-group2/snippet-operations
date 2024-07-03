@@ -1,8 +1,10 @@
 package austral.ingsis.snippetops.service
 
+import austral.ingsis.snippetops.dto.LintStatusForm
 import austral.ingsis.snippetops.dto.SnippetCreate
 import austral.ingsis.snippetops.dto.SnippetDTO
 import austral.ingsis.snippetops.dto.SnippetGetterForm
+import austral.ingsis.snippetops.dto.SnippetLintStatusDTO
 import austral.ingsis.snippetops.dto.SnippetLocation
 import austral.ingsis.snippetops.dto.SnippetPermissionsCreate
 import austral.ingsis.snippetops.dto.SnippetPermissionsDTO
@@ -121,7 +123,8 @@ class SnippetService(
             val content = this.bucketRepository.get(snippet.id.toString(), snippet.container)
             return when {
                 content.isPresent ->
-                    ResponseEntity.ok()
+                    ResponseEntity
+                        .ok()
                         .body(this.snippetDTO(snippet, content.get() as String))
                 else -> throw NotFoundException()
             }
@@ -222,6 +225,33 @@ class SnippetService(
         }
     }
 
+    fun getSnippetLintStatus(snippetId: Long): ResponseEntity<SnippetLintStatusDTO> {
+        try {
+            val lintStatusForm = LintStatusForm(snippetId)
+            val requestEntity = HttpEntity(lintStatusForm)
+
+            val response =
+                restTemplate.exchange(
+                    "$url/lint_status/getFromSnippetId",
+                    HttpMethod.GET,
+                    requestEntity,
+                    object : ParameterizedTypeReference<SnippetLintStatusDTO>() {},
+                )
+            if (response.body != null) {
+                val responseBody = response.body
+                return when (response.statusCode) {
+                    HttpStatus.OK -> ResponseEntity.ok().body(responseBody)
+                    HttpStatus.BAD_REQUEST -> ResponseEntity.badRequest().build()
+                    else -> ResponseEntity.notFound().build()
+                }
+            } else {
+                throw NullPointerException("Response body from permissions is null")
+            }
+        } catch (e: NullPointerException) {
+            return ResponseEntity(HttpStatus.CONFLICT)
+        }
+    }
+
     fun deleteSnippet(id: Long): ResponseEntity<Boolean> {
         try {
             val permissionResponse =
@@ -253,11 +283,36 @@ class SnippetService(
         }
     }
 
+    fun updateSnippetLintStatus(updateLintStatusDTO: SnippetLintStatusDTO): ResponseEntity<SnippetLintStatusDTO>  {
+        try {
+            val requestEntity = HttpEntity(updateLintStatusDTO)
+            val response =
+                restTemplate.exchange(
+                    "$url/lint_status/update",
+                    HttpMethod.POST,
+                    requestEntity,
+                    object : ParameterizedTypeReference<SnippetLintStatusDTO>() {},
+                )
+            if (response.body != null) {
+                val responseBody = response.body
+                return when (response.statusCode) {
+                    HttpStatus.OK -> ResponseEntity.ok().body(responseBody)
+                    HttpStatus.BAD_REQUEST -> ResponseEntity.badRequest().build()
+                    else -> ResponseEntity.notFound().build()
+                }
+            } else {
+                throw NullPointerException("Response body from permissions is null")
+            }
+        } catch (e: NullPointerException) {
+            return ResponseEntity(HttpStatus.CONFLICT)
+        }
+    }
+
     private fun snippetDTO(
         snippet: SnippetPermissionsDTO,
         content: String,
-    ): SnippetDTO {
-        return SnippetDTO(
+    ): SnippetDTO =
+        SnippetDTO(
             snippet.id,
             snippet.writer,
             snippet.name,
@@ -268,7 +323,6 @@ class SnippetService(
             snippet.creationDate,
             snippet.updateDate,
         )
-    }
 
     private fun checkCreateBody(body: SnippetCreate) {
         if (
@@ -281,15 +335,14 @@ class SnippetService(
     private fun createSnippetForPermissions(
         body: SnippetCreate,
         userId: String,
-    ): SnippetPermissionsCreate {
-        return SnippetPermissionsCreate(
+    ): SnippetPermissionsCreate =
+        SnippetPermissionsCreate(
             userId,
             body.name,
             body.language,
             body.extension,
             body.content,
         )
-    }
 
     private fun mapSnippetsIntoDtos(snippets: List<SnippetPermissionsDTO>?): List<SnippetDTO> {
         val dtos = mutableListOf<SnippetDTO>()

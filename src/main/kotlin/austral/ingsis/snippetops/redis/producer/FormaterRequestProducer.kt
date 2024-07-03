@@ -22,7 +22,6 @@ FormatterRequestProducer@Autowired
 
 data class FormaterRequest(
     val snippetId: Long,
-    val version: String,
     val snippetContent: String,
     val formatterRules: Map<String, Any>,
 )
