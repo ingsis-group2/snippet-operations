@@ -1,7 +1,7 @@
 package austral.ingsis.snippetops.userrule
 
 import austral.ingsis.snippetops.dto.permissions.User
-import austral.ingsis.snippetops.redis.producer.FormatterRequestProducer
+import austral.ingsis.snippetops.redis.producer.FormaterRequestProducer
 import austral.ingsis.snippetops.redis.producer.LintRequestProducer
 import austral.ingsis.snippetops.repository.BucketRepository
 import austral.ingsis.snippetops.service.SnippetService
@@ -18,13 +18,13 @@ class UserRuleGetterTest {
     private val bucketRepository: BucketRepository = mockk()
     private val snippetService: SnippetService = mockk()
     private val lintRequestProducer: LintRequestProducer = mockk()
-    private val formatterRequestProducer: FormatterRequestProducer = mockk()
+    private val formaterRequestProducer: FormaterRequestProducer = mockk()
     private val userRuleService: UserRuleService =
         UserRuleService(
             bucketRepository,
             snippetService,
             lintRequestProducer,
-            formatterRequestProducer,
+            formaterRequestProducer,
         )
     private val user = User("auth0|123456789", "Tista", "tista@mail.com")
     private val container = "lint"

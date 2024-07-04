@@ -1,10 +1,10 @@
 package austral.ingsis.snippetops.service
 
 import austral.ingsis.snippetops.dto.permissions.SnippetDTO
-import austral.ingsis.snippetops.redis.producer.FormaterRequest
-import austral.ingsis.snippetops.redis.producer.FormatterRequestProducer
+import austral.ingsis.snippetops.redis.producer.FormaterRequestProducer
 import austral.ingsis.snippetops.redis.producer.LintRequestProducer
 import austral.ingsis.snippetops.repository.BucketRepository
+import com.example.redisevents.FormaterRequest
 import com.example.redisevents.LintRequest
 import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,7 +16,7 @@ class UserRuleService(
     @Autowired val bucketRepository: BucketRepository,
     @Autowired private val snippetService: SnippetService,
     @Autowired private val lintRequestProducer: LintRequestProducer,
-    @Autowired private val formaterRequestProducer: FormatterRequestProducer,
+    @Autowired private val formaterRequestProducer: FormaterRequestProducer,
 ) {
     fun getUserRules(
         userId: String,

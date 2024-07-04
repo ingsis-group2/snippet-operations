@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 @Component
 @Profile("!test")
 class
-FormatterRequestProducer
+FormaterRequestProducer
     @Autowired
     constructor(
         @Value("\${stream.request_formater_key}") streamKey: String,
