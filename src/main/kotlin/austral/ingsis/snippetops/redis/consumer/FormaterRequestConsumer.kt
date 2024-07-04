@@ -17,8 +17,8 @@ class FormaterRequestConsumer
     @Autowired
     constructor(
         redis: RedisTemplate<String, String>,
-        @Value("\${spring.data.redis.stream.request_linter_result_key}") streamKey: String,
-        @Value("\${spring.data.redis.groups.lint_result}") groupId: String,
+        @Value("\${spring.data.redis.stream.request_format_result_key}") streamKey: String,
+        @Value("\${spring.data.redis.groups.format_result}") groupId: String,
         private val snippetService: SnippetService,
     ) : RedisStreamConsumer<FormatResult>(streamKey, groupId, redis) {
         init {
