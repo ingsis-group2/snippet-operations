@@ -19,11 +19,13 @@ FormatterRequestProducer
         suspend fun publishFormatRequest(event: FormaterRequest) {
             println("publishing on format stream: $event")
             emit(event)
+            println("published on format stream: $event")
         }
     }
 
 data class FormaterRequest(
     val snippetId: Long,
+    val writerId: String,
     val snippetContent: String,
     val formatterRules: Map<String, Any>,
 )

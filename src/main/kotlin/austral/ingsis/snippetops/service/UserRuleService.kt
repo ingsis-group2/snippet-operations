@@ -108,6 +108,7 @@ class UserRuleService(
             val formatRequest =
                 FormaterRequest(
                     it.id,
+                    it.user.id,
                     it.content,
                     formatRules,
                 )
