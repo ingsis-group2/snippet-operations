@@ -59,7 +59,9 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.3")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
-
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("io.mockk:mockk:1.12.0")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.austral.ingsis:redis-streams-mvc:0.1.13")
     implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive:+")
@@ -86,7 +88,15 @@ tasks.named("check") {
 koverReport {
     verify {
         rule {
-            minBound(0)
+            minBound(70)
+        }
+        filters {
+            excludes {
+                packages("austral.ingsis.snippetops.config")
+                packages("austral.ingsis.snippetops.controller")
+                packages("austral.ingsis.snippetops.logging")
+                packages("austral.ingsis.snippetops.redis")
+            }
         }
     }
 }
