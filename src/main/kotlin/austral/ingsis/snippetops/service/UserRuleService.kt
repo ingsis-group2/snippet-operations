@@ -6,7 +6,6 @@ import austral.ingsis.snippetops.redis.producer.LintRequestProducer
 import austral.ingsis.snippetops.repository.BucketRepository
 import com.example.redisevents.FormaterRequest
 import com.example.redisevents.LintRequest
-import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -93,9 +92,7 @@ class UserRuleService(
                     it.content,
                     lintingRules,
                 )
-            runBlocking {
-                lintRequestProducer.publishLintRequest(lintRequest)
-            }
+            lintRequestProducer.publishLintRequest(lintRequest)
         }
     }
 
@@ -112,9 +109,8 @@ class UserRuleService(
                     it.content,
                     formatRules,
                 )
-            runBlocking {
-                formaterRequestProducer.publishFormatRequest(formatRequest)
-            }
+
+            formaterRequestProducer.publishFormatRequest(formatRequest)
         }
     }
 

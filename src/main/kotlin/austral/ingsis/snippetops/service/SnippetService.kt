@@ -186,8 +186,6 @@ class SnippetService(
 
     fun getSnippetLintStatus(snippetId: Long): ResponseEntity<SnippetLintStatusDTO> {
         try {
-            val lintStatusForm = LintStatusForm(snippetId)
-
             val response =
                 restTemplate.exchange(
                     "$url/lintStatus/$snippetId",
