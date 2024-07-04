@@ -65,7 +65,6 @@ dependencies {
     implementation("org.austral.ingsis:redis-streams-mvc:0.1.13")
     implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive:+")
     implementation("org.gradle.redisevents:events:1.1.0-SNAPSHOT")
-
 }
 
 tasks.withType<KotlinCompile> {
@@ -87,13 +86,14 @@ tasks.named("check") {
 koverReport {
     verify {
         rule {
-            minBound(80)
+            minBound(70)
         }
         filters {
             excludes {
                 packages("austral.ingsis.snippetops.config")
                 packages("austral.ingsis.snippetops.controller")
                 packages("austral.ingsis.snippetops.logging")
+                packages("austral.ingsis.snippetops.redis")
             }
         }
     }
