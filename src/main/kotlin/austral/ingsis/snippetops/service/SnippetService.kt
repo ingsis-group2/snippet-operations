@@ -157,7 +157,7 @@ class SnippetService(
         return this.getSnippetBySomeone(
             "$url/snippet/byWriter",
             userId,
-            page
+            page,
         )
     }
 
@@ -168,7 +168,7 @@ class SnippetService(
         return this.getSnippetBySomeone(
             "$url/snippet/byReader",
             userId,
-            page
+            page,
         )
     }
 
@@ -179,7 +179,7 @@ class SnippetService(
         return this.getSnippetBySomeone(
             "$url/snippet/byReaderAndWriter",
             userId,
-            page
+            page,
         )
     }
 
@@ -266,16 +266,25 @@ class SnippetService(
         return dtos.toList()
     }
 
-    fun <T> sendRequest(url: String, method: HttpMethod, request: HttpEntity<*>?, typeExpected: Class<T>): ResponseEntity<T> {
+    fun <T> sendRequest(
+        url: String,
+        method: HttpMethod,
+        request: HttpEntity<*>?,
+        typeExpected: Class<T>,
+    ): ResponseEntity<T> {
         return restTemplate.exchange(
             url,
             method,
             request,
-            typeExpected
+            typeExpected,
         )
     }
 
-    private fun getSnippetBySomeone(url: String, userId: String, page: Int): ResponseEntity<List<SnippetDTO>> {
+    private fun getSnippetBySomeone(
+        url: String,
+        userId: String,
+        page: Int,
+    ): ResponseEntity<List<SnippetDTO>> {
         try {
             val snippetGetterForm = SnippetGetterForm(userId, page, 10)
             val requestEntity = HttpEntity(snippetGetterForm)

@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestTemplate
 
 class RunnerExecuteTestCaseTes {
-
     private val restTemplate: RestTemplate = mockk()
     private val snippetService: SnippetService = mockk()
     private val runnerService = RunnerService("", restTemplate, snippetService)
@@ -24,7 +23,7 @@ class RunnerExecuteTestCaseTes {
             inputs = emptyList(),
             envs = emptyMap(),
             expectedOutput = listOf("Es un snippet poco fachero"),
-            language = "spanish"
+            language = "spanish",
         )
 
     @Test

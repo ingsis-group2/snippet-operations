@@ -6,16 +6,15 @@ import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.springframework.http.ResponseEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
 import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestTemplate
 
 class BucketRepositoryTest {
-
     private val restTemplate: RestTemplate = mockk()
     private val url = "http://asset_service:8080/v1/asset"
     private val bucketRepository = BucketRepositoryImpl(url, restTemplate)
@@ -31,12 +30,14 @@ class BucketRepositoryTest {
                 contentType = MediaType.APPLICATION_JSON
             }
         val requestEntity = HttpEntity(snippetContent, headers)
-        every {  restTemplate.exchange(
-            "http://asset_service:8080/v1/asset/$snippetContainer/$snippet",
-            HttpMethod.POST,
-            requestEntity,
-            Void::class.java,
-        )} returns ResponseEntity(HttpStatus.CREATED)
+        every {
+            restTemplate.exchange(
+                "http://asset_service:8080/v1/asset/$snippetContainer/$snippet",
+                HttpMethod.POST,
+                requestEntity,
+                Void::class.java,
+            )
+        } returns ResponseEntity(HttpStatus.CREATED)
 
         val response = bucketRepository.save(snippet.toString(), snippetContainer, snippetContent, String::class.java)
         assertTrue(response.isPresent)
@@ -50,12 +51,14 @@ class BucketRepositoryTest {
                 contentType = MediaType.APPLICATION_JSON
             }
         val requestEntity = HttpEntity(snippetContent, headers)
-        every {  restTemplate.exchange(
-            "http://asset_service:8080/v1/asset/$snippetContainer/$snippet",
-            HttpMethod.POST,
-            requestEntity,
-            Void::class.java,
-        )} returns ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+        every {
+            restTemplate.exchange(
+                "http://asset_service:8080/v1/asset/$snippetContainer/$snippet",
+                HttpMethod.POST,
+                requestEntity,
+                Void::class.java,
+            )
+        } returns ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
 
         val response = bucketRepository.save(snippet.toString(), snippetContainer, snippetContent, String::class.java)
         assertTrue(response.isPresent)
@@ -64,12 +67,14 @@ class BucketRepositoryTest {
 
     @Test
     fun `should success with Optional content while getting snippet content by key`() {
-        every {  restTemplate.exchange(
-            "http://asset_service:8080/v1/asset/$snippetContainer/$snippet",
-            HttpMethod.GET,
-            null,
-            String::class.java,
-        )} returns ResponseEntity(snippetContent, HttpStatus.OK)
+        every {
+            restTemplate.exchange(
+                "http://asset_service:8080/v1/asset/$snippetContainer/$snippet",
+                HttpMethod.GET,
+                null,
+                String::class.java,
+            )
+        } returns ResponseEntity(snippetContent, HttpStatus.OK)
 
         val response = bucketRepository.get(snippet.toString(), snippetContainer, String::class.java)
         assertTrue(response.isPresent)
@@ -78,12 +83,14 @@ class BucketRepositoryTest {
 
     @Test
     fun `should fail with Optional empty because asset service failed with Not_Found status`() {
-        every {  restTemplate.exchange(
-            "http://asset_service:8080/v1/asset/$snippetContainer/$snippet",
-            HttpMethod.GET,
-            null,
-            String::class.java,
-        )} returns ResponseEntity.notFound().build()
+        every {
+            restTemplate.exchange(
+                "http://asset_service:8080/v1/asset/$snippetContainer/$snippet",
+                HttpMethod.GET,
+                null,
+                String::class.java,
+            )
+        } returns ResponseEntity.notFound().build()
 
         val response = bucketRepository.get(snippet.toString(), snippetContainer, String::class.java)
         assertTrue(response.isEmpty)
@@ -91,12 +98,14 @@ class BucketRepositoryTest {
 
     @Test
     fun `should success with Optional true while deleting a snippet content by key`() {
-        every {  restTemplate.exchange(
-            "http://asset_service:8080/v1/asset/$snippetContainer/$snippet",
-            HttpMethod.DELETE,
-            null,
-            Void::class.java,
-        )} returns ResponseEntity(HttpStatus.OK)
+        every {
+            restTemplate.exchange(
+                "http://asset_service:8080/v1/asset/$snippetContainer/$snippet",
+                HttpMethod.DELETE,
+                null,
+                Void::class.java,
+            )
+        } returns ResponseEntity(HttpStatus.OK)
 
         val response = bucketRepository.delete(snippet.toString(), snippetContainer)
         assertTrue(response.isPresent)
@@ -105,12 +114,14 @@ class BucketRepositoryTest {
 
     @Test
     fun `should fail with Optional false while deleting a snippet because asset service failed finding`() {
-        every {  restTemplate.exchange(
-            "http://asset_service:8080/v1/asset/$snippetContainer/$snippet",
-            HttpMethod.DELETE,
-            null,
-            Void::class.java,
-        )} returns ResponseEntity(HttpStatus.NOT_FOUND)
+        every {
+            restTemplate.exchange(
+                "http://asset_service:8080/v1/asset/$snippetContainer/$snippet",
+                HttpMethod.DELETE,
+                null,
+                Void::class.java,
+            )
+        } returns ResponseEntity(HttpStatus.NOT_FOUND)
 
         val response = bucketRepository.delete(snippet.toString(), snippetContainer)
         assertTrue(response.isPresent)

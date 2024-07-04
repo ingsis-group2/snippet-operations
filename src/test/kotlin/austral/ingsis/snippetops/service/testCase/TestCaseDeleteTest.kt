@@ -9,26 +9,26 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
-import java.util.UUID
 import java.util.Optional
+import java.util.UUID
 
 class TestCaseDeleteTest {
-
     private val bucketRepository: BucketRepository = mockk()
     private val testCaseService = TestCaseService(bucketRepository)
     private val snippetId = 1L
     private val testCaseContainer = "test"
     private val testCaseIdContainer = "test-case-id"
     private val userId = "auth0|123456789"
-    private val alreadyExistedTestCase = OperationsTestDTO(
-        id = UUID.randomUUID().toString(),
-        name = "another cool name",
-        snippetId = snippetId,
-        version = "1.0",
-        inputs = emptyList(),
-        envs = emptyMap(),
-        output = listOf("Expected output A", "Expected output B"),
-    )
+    private val alreadyExistedTestCase =
+        OperationsTestDTO(
+            id = UUID.randomUUID().toString(),
+            name = "another cool name",
+            snippetId = snippetId,
+            version = "1.0",
+            inputs = emptyList(),
+            envs = emptyMap(),
+            output = listOf("Expected output A", "Expected output B"),
+        )
 
     @Test
     fun `should success with status OK by deleting a test case`() {

@@ -17,7 +17,6 @@ import org.springframework.web.client.RestTemplate
 import java.time.LocalDateTime
 
 class RunnerFormatTest {
-
     private val restTemplate: RestTemplate = mockk()
     private val snippetService: SnippetService = mockk()
     private val runnerService = RunnerService("", restTemplate, snippetService)
@@ -28,7 +27,7 @@ class RunnerFormatTest {
             user = user,
             name = "Nombre fachero",
             language = "spanish",
-            extension =  ".en",
+            extension = ".en",
             readers = emptyList(),
             content = "Contenido muy fachero",
             creationDate = LocalDateTime.now(),
@@ -37,14 +36,14 @@ class RunnerFormatTest {
     private val runnerFormat =
         RunnerFormatDTO(
             content = snippetDTO.content,
-            version =  "1.0",
+            version = "1.0",
             formatRules = emptyMap(),
-            language = snippetDTO.language
+            language = snippetDTO.language,
         )
     private val formatOutput =
         FormatOutputDTO(
             formattedCode = "Un formato que hace mucho más fachero al contenido muy fachero",
-            errors = emptyList()
+            errors = emptyList(),
         )
 
     @Test

@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:no-wildcard-imports")
+
 package austral.ingsis.snippetops.service.testCase
 
 import austral.ingsis.snippetops.dto.operations.OperationsTestDTO
@@ -12,21 +14,21 @@ import java.util.Optional
 import java.util.UUID
 
 class TestCaseGetterTest {
-
     private val bucketRepository: BucketRepository = mockk()
     private val testCaseService = TestCaseService(bucketRepository)
     private val snippetId = 1L
     private val userId = "auth0|123456789"
     private val testCaseContainer = "test"
-    private val alreadyExistedTestCase = OperationsTestDTO(
-        id = UUID.randomUUID().toString(),
-        name = "another cool name",
-        snippetId = snippetId,
-        version = "1.0",
-        inputs = emptyList(),
-        envs = emptyMap(),
-        output = listOf("Expected output A", "Expected output B"),
-    )
+    private val alreadyExistedTestCase =
+        OperationsTestDTO(
+            id = UUID.randomUUID().toString(),
+            name = "another cool name",
+            snippetId = snippetId,
+            version = "1.0",
+            inputs = emptyList(),
+            envs = emptyMap(),
+            output = listOf("Expected output A", "Expected output B"),
+        )
 
     @Test
     fun `should success with status OK getting a test case by id`() {

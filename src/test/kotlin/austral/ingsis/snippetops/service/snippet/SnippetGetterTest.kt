@@ -1,6 +1,10 @@
+@file:Suppress("ktlint:standard:no-wildcard-imports")
+
 package austral.ingsis.snippetops.service.snippet
 
-import austral.ingsis.snippetops.dto.permissions.*
+import austral.ingsis.snippetops.dto.permissions.SnippetGetterForm
+import austral.ingsis.snippetops.dto.permissions.SnippetPermissionsDTO
+import austral.ingsis.snippetops.dto.permissions.User
 import austral.ingsis.snippetops.repository.BucketRepository
 import austral.ingsis.snippetops.service.SnippetService
 import austral.ingsis.snippetops.service.UserService
@@ -15,7 +19,6 @@ import java.time.LocalDateTime
 import java.util.*
 
 class SnippetGetterTest {
-
     private val bucketRepository: BucketRepository = mockk()
     private val restTemplate: RestTemplate = mockk()
     private val userService: UserService = mockk()
@@ -23,45 +26,53 @@ class SnippetGetterTest {
     private val snippetService = SnippetService(url, bucketRepository, restTemplate, userService)
     private val user = User("userId1234", "tista", "tista@mail.com")
     private val anotherUser = User("anotherUser", "papa", "papa@mail.com")
-    private val firstSnippetWrittenByTistaPermissionsDTO = SnippetPermissionsDTO(
-        id = 1L,
-        container = "container",
-        writer = user.id,
-        name = "Tista first snippet",
-        language = "Kotlin",
-        extension = ".kt",
-        readers = listOf(),
-        creationDate = LocalDateTime.now(),
-        updateDate = null
-    )
-    private val secondSnippetWrittenByTistaPermissionsDTO = SnippetPermissionsDTO(
-        id = 2L,
-        container = "container",
-        writer = user.id,
-        name = "Tista second snippet",
-        language = "Python",
-        extension = ".py",
-        readers = listOf(),
-        creationDate = LocalDateTime.now(),
-        updateDate = null
-    )
-    private val snippetThatTistaCanRead = SnippetPermissionsDTO(
-        id = 10L,
-        container = "container",
-        writer = anotherUser.id,
-        name = "A cool name",
-        language = "Kotlin",
-        extension = ".kt",
-        readers = listOf("userId1234"),
-        creationDate = LocalDateTime.now(),
-        updateDate = null
-    )
+    private val firstSnippetWrittenByTistaPermissionsDTO =
+        SnippetPermissionsDTO(
+            id = 1L,
+            container = "container",
+            writer = user.id,
+            name = "Tista first snippet",
+            language = "Kotlin",
+            extension = ".kt",
+            readers = listOf(),
+            creationDate = LocalDateTime.now(),
+            updateDate = null,
+        )
+    private val secondSnippetWrittenByTistaPermissionsDTO =
+        SnippetPermissionsDTO(
+            id = 2L,
+            container = "container",
+            writer = user.id,
+            name = "Tista second snippet",
+            language = "Python",
+            extension = ".py",
+            readers = listOf(),
+            creationDate = LocalDateTime.now(),
+            updateDate = null,
+        )
+    private val snippetThatTistaCanRead =
+        SnippetPermissionsDTO(
+            id = 10L,
+            container = "container",
+            writer = anotherUser.id,
+            name = "A cool name",
+            language = "Kotlin",
+            extension = ".kt",
+            readers = listOf("userId1234"),
+            creationDate = LocalDateTime.now(),
+            updateDate = null,
+        )
 
     @Test
     fun `should success with status OK and return a snippet by Id`() {
         val id = firstSnippetWrittenByTistaPermissionsDTO.id
         every {
-            snippetService.sendRequest("http://snippet-permissions:8080/snippet/$id", HttpMethod.GET, null, SnippetPermissionsDTO::class.java)
+            snippetService.sendRequest(
+                "http://snippet-permissions:8080/snippet/$id",
+                HttpMethod.GET,
+                null,
+                SnippetPermissionsDTO::class.java,
+            )
         } returns ResponseEntity.ok(firstSnippetWrittenByTistaPermissionsDTO)
         every { bucketRepository.get(id.toString(), "container", String::class.java) } returns Optional.of("first snippet content")
         every { userService.getUserById("userId1234") } returns user
@@ -79,7 +90,12 @@ class SnippetGetterTest {
     fun `should success with status Not_Found`() {
         val nonExistentId = 3L
         every {
-            snippetService.sendRequest("http://snippet-permissions:8080/snippet/$nonExistentId", HttpMethod.GET, null, SnippetPermissionsDTO::class.java)
+            snippetService.sendRequest(
+                "http://snippet-permissions:8080/snippet/$nonExistentId",
+                HttpMethod.GET,
+                null,
+                SnippetPermissionsDTO::class.java,
+            )
         } returns ResponseEntity.notFound().build()
 
         val response = snippetService.getSnippet(nonExistentId)
@@ -89,10 +105,11 @@ class SnippetGetterTest {
     @Test
     fun `should success with status OK and return a list of snippets written by Tista`() {
         val page = 1
-        val snippetPermissionsDTO = listOf(
-            firstSnippetWrittenByTistaPermissionsDTO,
-            secondSnippetWrittenByTistaPermissionsDTO
-        )
+        val snippetPermissionsDTO =
+            listOf(
+                firstSnippetWrittenByTistaPermissionsDTO,
+                secondSnippetWrittenByTistaPermissionsDTO,
+            )
         val requestEntity = HttpEntity(SnippetGetterForm(user.id, page, 10))
 
         every {
@@ -100,11 +117,15 @@ class SnippetGetterTest {
                 "http://snippet-permissions:8080/snippet/byWriter",
                 HttpMethod.POST,
                 requestEntity,
-                object : ParameterizedTypeReference<List<SnippetPermissionsDTO>>() {}
+                object : ParameterizedTypeReference<List<SnippetPermissionsDTO>>() {},
             )
         } returns ResponseEntity(snippetPermissionsDTO, HttpStatus.OK)
-        every { bucketRepository.get("1", firstSnippetWrittenByTistaPermissionsDTO.container, String::class.java) } returns Optional.of("first snippet content")
-        every { bucketRepository.get("2", secondSnippetWrittenByTistaPermissionsDTO.container, String::class.java) } returns Optional.of("second snippet content")
+        every {
+            bucketRepository.get("1", firstSnippetWrittenByTistaPermissionsDTO.container, String::class.java)
+        } returns Optional.of("first snippet content")
+        every {
+            bucketRepository.get("2", secondSnippetWrittenByTistaPermissionsDTO.container, String::class.java)
+        } returns Optional.of("second snippet content")
         every { userService.getUserById("userId1234") } returns user
 
         val response = snippetService.getSnippetByWriter(user.id, page)
@@ -128,7 +149,7 @@ class SnippetGetterTest {
                 "http://snippet-permissions:8080/snippet/byReader",
                 HttpMethod.POST,
                 requestEntity,
-                object : ParameterizedTypeReference<List<SnippetPermissionsDTO>>() {}
+                object : ParameterizedTypeReference<List<SnippetPermissionsDTO>>() {},
             )
         } returns ResponseEntity(snippetPermissions, HttpStatus.OK)
         every {
@@ -149,11 +170,12 @@ class SnippetGetterTest {
 
     @Test
     fun `should success with status OK and return a list of snippets that Tista wrote and can read`() {
-        val snippetPermissions = listOf(
-            firstSnippetWrittenByTistaPermissionsDTO,
-            secondSnippetWrittenByTistaPermissionsDTO,
-            snippetThatTistaCanRead,
-        )
+        val snippetPermissions =
+            listOf(
+                firstSnippetWrittenByTistaPermissionsDTO,
+                secondSnippetWrittenByTistaPermissionsDTO,
+                snippetThatTistaCanRead,
+            )
         val requestEntity = HttpEntity(SnippetGetterForm(user.id, 0, 10))
 
         every {
@@ -161,14 +183,22 @@ class SnippetGetterTest {
                 "http://snippet-permissions:8080/snippet/byReaderAndWriter",
                 HttpMethod.POST,
                 requestEntity,
-                object : ParameterizedTypeReference<List<SnippetPermissionsDTO>>() {}
+                object : ParameterizedTypeReference<List<SnippetPermissionsDTO>>() {},
             )
         } returns ResponseEntity(snippetPermissions, HttpStatus.OK)
         every {
-            bucketRepository.get(firstSnippetWrittenByTistaPermissionsDTO.id.toString(), firstSnippetWrittenByTistaPermissionsDTO.container, String::class.java)
+            bucketRepository.get(
+                firstSnippetWrittenByTistaPermissionsDTO.id.toString(),
+                firstSnippetWrittenByTistaPermissionsDTO.container,
+                String::class.java,
+            )
         } returns Optional.of("first snippet content")
         every {
-            bucketRepository.get(secondSnippetWrittenByTistaPermissionsDTO.id.toString(), secondSnippetWrittenByTistaPermissionsDTO.container, String::class.java)
+            bucketRepository.get(
+                secondSnippetWrittenByTistaPermissionsDTO.id.toString(),
+                secondSnippetWrittenByTistaPermissionsDTO.container,
+                String::class.java,
+            )
         } returns Optional.of("second snippet content")
         every {
             bucketRepository.get(snippetThatTistaCanRead.id.toString(), snippetThatTistaCanRead.container, String::class.java)

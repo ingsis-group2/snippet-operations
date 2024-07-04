@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestTemplate
 
 class RunnerLintingTest {
-
     private val restTemplate: RestTemplate = mockk()
     private val snippetService: SnippetService = mockk()
     private val runnerService = RunnerService("", restTemplate, snippetService)
@@ -54,5 +53,4 @@ class RunnerLintingTest {
         assertTrue(responseBody.reportList.isEmpty())
         assertEquals(responseBody.errors.get(0), errorName)
     }
-
 }

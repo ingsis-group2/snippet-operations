@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestTemplate
 
 class SnippetAddReaderTest {
-
     private val bucketRepository: BucketRepository = mockk()
     private val restTemplate: RestTemplate = mockk()
     private val userService: UserService = mockk()
@@ -33,14 +32,16 @@ class SnippetAddReaderTest {
 
     @Test
     fun `should fail with bad request because can not find user`() {
-        every { userService.getUserByEmail(readerMail) } returns null  //user does not exist, so method returns null
+        every { userService.getUserByEmail(readerMail) } returns null // user does not exist, so method returns null
         val response = snippetService.addNewReaderIntoSnippet(userId, readerMail, 1L)
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
     }
 
     @Test
     fun `should fail with bad request because snippet permissions failed in response`() {
-        every { snippetService.sendRequest(any(), HttpMethod.POST, any(), Boolean::class.java) } returns ResponseEntity.internalServerError().build()
+        every {
+            snippetService.sendRequest(any(), HttpMethod.POST, any(), Boolean::class.java)
+        } returns ResponseEntity.internalServerError().build()
         every { userService.getUserByEmail(readerMail) } returns readerUser
         val response = snippetService.addNewReaderIntoSnippet(userId, readerMail, 1L)
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)

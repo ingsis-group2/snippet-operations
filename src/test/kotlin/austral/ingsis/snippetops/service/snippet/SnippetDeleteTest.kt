@@ -18,24 +18,24 @@ import java.time.LocalDateTime
 import java.util.Optional
 
 class SnippetDeleteTest {
-
     private val bucketRepository: BucketRepository = mockk()
     private val restTemplate: RestTemplate = mockk()
     private val userService: UserService = mockk()
     private val url = "http://snippet-permissions:8080"
     private val snippetService = SnippetService(url, bucketRepository, restTemplate, userService)
     private val user = User("userId1234", "tista", "tista@mail.com")
-    private val snippet = SnippetPermissionsDTO(
-        id = 1L,
-        container = "container",
-        writer = user.id,
-        name = "Tista first snippet",
-        language = "Kotlin",
-        extension = ".kt",
-        readers = listOf(),
-        creationDate = LocalDateTime.now(),
-        updateDate = null
-    )
+    private val snippet =
+        SnippetPermissionsDTO(
+            id = 1L,
+            container = "container",
+            writer = user.id,
+            name = "Tista first snippet",
+            language = "Kotlin",
+            extension = ".kt",
+            readers = listOf(),
+            creationDate = LocalDateTime.now(),
+            updateDate = null,
+        )
     private val snippetLocation = SnippetLocation(snippet.id, snippet.container)
 
     @Test

@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestTemplate
 
 class RunnerExecuteTest {
-
     private val restTemplate: RestTemplate = mockk()
     private val snippetService: SnippetService = mockk()
     private val runnerService = RunnerService("", restTemplate, snippetService)
@@ -28,7 +27,7 @@ class RunnerExecuteTest {
     private val executionOutput =
         ExecutionOutputDTO(
             listOf("Output del snippet fachero sin errores porque es muy fachero"),
-            emptyList()
+            emptyList(),
         )
 
     @Test

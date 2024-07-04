@@ -16,21 +16,22 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestTemplate
 
 class UserGetTest {
-
     private val restTemplate: RestTemplate = mockk()
     private val userService = UserService("", "", "", restTemplate)
     private val alreadyExistedUser = User("TistaId", "Tista", "Tista@mail.com")
-    private val tokenResponse = ResponseEntity<Map<*, *>>(
-        mapOf("access_token" to "this is a cool token"),
-        HttpStatus.OK
-    )
-    private val authResponseWithUser = ResponseEntity<Map<*,*>>(
-        mapOf(
-            "nickname" to alreadyExistedUser.username,
-            "email" to alreadyExistedUser.email,
-        ),
-        HttpStatus.OK
-    )
+    private val tokenResponse =
+        ResponseEntity<Map<*, *>>(
+            mapOf("access_token" to "this is a cool token"),
+            HttpStatus.OK,
+        )
+    private val authResponseWithUser =
+        ResponseEntity<Map<*, *>>(
+            mapOf(
+                "nickname" to alreadyExistedUser.username,
+                "email" to alreadyExistedUser.email,
+            ),
+            HttpStatus.OK,
+        )
 
     @Test
     fun `should success getting user by id`() {
@@ -39,7 +40,7 @@ class UserGetTest {
                 any<String>(),
                 eq(HttpMethod.POST),
                 any<HttpEntity<Map<String, String>>>(),
-                eq(Map::class.java)
+                eq(Map::class.java),
             )
         } returns tokenResponse
         every {
@@ -65,7 +66,7 @@ class UserGetTest {
                 any<String>(),
                 eq(HttpMethod.POST),
                 any<HttpEntity<Map<String, String>>>(),
-                eq(Map::class.java)
+                eq(Map::class.java),
             )
         } returns ResponseEntity(null, HttpStatus.FORBIDDEN)
 
@@ -75,18 +76,19 @@ class UserGetTest {
 
     @Test
     fun `should success getting user by email`() {
-        val userInResponse = mapOf(
-            "user_id" to alreadyExistedUser.id,
-            "nickname" to alreadyExistedUser.username,
-            "email" to alreadyExistedUser.email
-        )
+        val userInResponse =
+            mapOf(
+                "user_id" to alreadyExistedUser.id,
+                "nickname" to alreadyExistedUser.username,
+                "email" to alreadyExistedUser.email,
+            )
         val authResponseForCase = ResponseEntity<Array<*>>(arrayOf(userInResponse), HttpStatus.OK)
         every {
             restTemplate.exchange(
                 any<String>(),
                 eq(HttpMethod.POST),
                 any<HttpEntity<Map<String, String>>>(),
-                eq(Map::class.java)
+                eq(Map::class.java),
             )
         } returns tokenResponse
         every {
@@ -112,7 +114,7 @@ class UserGetTest {
                 any<String>(),
                 eq(HttpMethod.POST),
                 any<HttpEntity<Map<String, String>>>(),
-                eq(Map::class.java)
+                eq(Map::class.java),
             )
         } returns ResponseEntity(null, HttpStatus.FORBIDDEN)
 
@@ -127,7 +129,7 @@ class UserGetTest {
                 any<String>(),
                 eq(HttpMethod.POST),
                 any<HttpEntity<Map<String, String>>>(),
-                eq(Map::class.java)
+                eq(Map::class.java),
             )
         } returns tokenResponse
         every {
@@ -151,7 +153,7 @@ class UserGetTest {
                 any<String>(),
                 eq(HttpMethod.POST),
                 any<HttpEntity<Map<String, String>>>(),
-                eq(Map::class.java)
+                eq(Map::class.java),
             )
         } returns ResponseEntity(null, HttpStatus.FORBIDDEN)
 
@@ -162,18 +164,19 @@ class UserGetTest {
     @Test
     fun `should success getting all users`() {
         val anotherUser = User("SecondTistaId", "SecondTista", "secondTista@mail.com")
-        val usersList = listOf(
-            mapOf(
-                "user_id" to alreadyExistedUser.id,
-                "nickname" to alreadyExistedUser.username,
-                "email" to alreadyExistedUser.email
-            ),
-            mapOf(
-                "user_id" to anotherUser.id,
-                "nickname" to anotherUser.username,
-                "email" to anotherUser.email
+        val usersList =
+            listOf(
+                mapOf(
+                    "user_id" to alreadyExistedUser.id,
+                    "nickname" to alreadyExistedUser.username,
+                    "email" to alreadyExistedUser.email,
+                ),
+                mapOf(
+                    "user_id" to anotherUser.id,
+                    "nickname" to anotherUser.username,
+                    "email" to anotherUser.email,
+                ),
             )
-        )
         val authResponse = ResponseEntity<List<Map<*, *>>>(usersList, HttpStatus.OK)
 
         every {
@@ -181,7 +184,7 @@ class UserGetTest {
                 any<String>(),
                 eq(HttpMethod.POST),
                 any<HttpEntity<Map<String, String>>>(),
-                eq(Map::class.java)
+                eq(Map::class.java),
             )
         } returns tokenResponse
 
@@ -190,7 +193,7 @@ class UserGetTest {
                 any<String>(),
                 eq(HttpMethod.GET),
                 any<HttpEntity<*>>(),
-                object : ParameterizedTypeReference<List<Map<*, *>>>() {}
+                object : ParameterizedTypeReference<List<Map<*, *>>>() {},
             )
         } returns authResponse
 
