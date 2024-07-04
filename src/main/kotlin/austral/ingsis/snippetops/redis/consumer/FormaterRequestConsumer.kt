@@ -45,6 +45,7 @@ class FormaterRequestConsumer
                     record.value.formattedSnippet,
                     record.value.userId,
                 )
+
             if (response.statusCode.is2xxSuccessful) {
                 println("Snippet updated successfully")
                 println("------------------------------------------------------")
