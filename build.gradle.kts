@@ -20,6 +20,14 @@ repositories {
     gradlePluginPortal()
     mavenCentral()
     maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/austral-ingsis/class-redis-stream")
+        credentials {
+            username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+            password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+        }
+    }
+    maven {
         name = "GitHubPackagesRedisEvents"
         url = uri("https://maven.pkg.github.com/ingsis-group2/redis-events")
         credentials {
