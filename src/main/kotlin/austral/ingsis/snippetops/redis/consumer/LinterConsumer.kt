@@ -2,6 +2,7 @@ package austral.ingsis.snippetops.redis.consumer
 
 import austral.ingsis.snippetops.dto.permissions.UpdateLintStatusDTO
 import austral.ingsis.snippetops.service.SnippetService
+import com.example.redisevents.LintResult
 import org.austral.ingsis.redis.RedisStreamConsumer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -52,9 +53,3 @@ class LinterConsumer
             }
         }
     }
-
-data class LintResult(
-    val snippetId: Long,
-    val reportList: List<String>,
-    val errorList: List<String>,
-)

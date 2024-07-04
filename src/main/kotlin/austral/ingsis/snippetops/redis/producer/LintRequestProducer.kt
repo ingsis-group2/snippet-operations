@@ -1,5 +1,6 @@
 package austral.ingsis.snippetops.redis.producer
 
+import com.example.redisevents.LintRequest
 import org.austral.ingsis.redis.RedisStreamProducer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -21,9 +22,3 @@ class LintRequestProducer
             println("published on lint stream: $event")
         }
     }
-
-data class LintRequest(
-    val snippetId: Long,
-    val snippetContent: String,
-    val lintRules: Map<String, Any>,
-)
