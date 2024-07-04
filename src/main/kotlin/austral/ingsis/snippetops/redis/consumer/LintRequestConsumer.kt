@@ -34,10 +34,22 @@ class LinterConsumer
                 .build()
 
         override fun onMessage(record: ObjectRecord<String, LintResultEvent>) {
+            println("------------------------------------------------------")
             println("message received on linter result stream: ${record.value}")
-            snippetService.updateSnippetLintStatus(
-                UpdateLintStatusDTO(record.value.snippetId, record.value.reportList, record.value.errorList),
-            )
+            println("snippet id: ${record.value.snippetId}")
+            println("report list: ${record.value.reportList}")
+            println("error list: ${record.value.errorList}")
+            val response =
+                snippetService.updateSnippetLintStatus(
+                    UpdateLintStatusDTO(record.value.snippetId, record.value.reportList, record.value.errorList),
+                )
+            if (response.statusCode.is2xxSuccessful) {
+                println("Snippet lint status updated successfully")
+                println("------------------------------------------------------")
+            } else {
+                println("Failed to update snippet lint status")
+                println("------------------------------------------------------")
+            }
         }
     }
 

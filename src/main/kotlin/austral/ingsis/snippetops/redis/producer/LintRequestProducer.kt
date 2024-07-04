@@ -18,6 +18,7 @@ class LintRequestProducer
         suspend fun publishLintRequest(event: LintRequest) {
             println("publishing on lint stream: $event")
             emit(event)
+            println("published on lint stream: $event")
         }
     }
 
