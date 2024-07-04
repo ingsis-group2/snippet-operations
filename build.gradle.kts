@@ -23,8 +23,8 @@ repositories {
         name = "GitHubPackagesRedisEvents"
         url = uri("https://maven.pkg.github.com/ingsis-group2/redis-events")
         credentials {
-            username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
-            password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+            username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+            password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
         }
     }
 }
