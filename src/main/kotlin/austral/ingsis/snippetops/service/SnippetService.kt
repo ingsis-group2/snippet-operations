@@ -187,13 +187,12 @@ class SnippetService(
     fun getSnippetLintStatus(snippetId: Long): ResponseEntity<SnippetLintStatusDTO> {
         try {
             val lintStatusForm = LintStatusForm(snippetId)
-            val requestEntity = HttpEntity(lintStatusForm)
 
             val response =
                 restTemplate.exchange(
-                    "$url/lint_status/getFromSnippetId",
+                    "$url/lintStatus/$snippetId",
                     HttpMethod.GET,
-                    requestEntity,
+                    null,
                     object : ParameterizedTypeReference<SnippetLintStatusDTO>() {},
                 )
             if (response.body != null) {
@@ -247,7 +246,7 @@ class SnippetService(
             val requestEntity = HttpEntity(updateLintStatusDTO)
             val response =
                 restTemplate.exchange(
-                    "$url/lint_status/update",
+                    "$url/lintStatus",
                     HttpMethod.POST,
                     requestEntity,
                     object : ParameterizedTypeReference<SnippetLintStatusDTO>() {},
