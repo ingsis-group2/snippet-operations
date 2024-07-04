@@ -1,6 +1,5 @@
 package austral.ingsis.snippetops.service
 
-import austral.ingsis.snippetops.dto.permissions.LintStatusForm
 import austral.ingsis.snippetops.dto.permissions.NewReaderForm
 import austral.ingsis.snippetops.dto.permissions.SnippetCreate
 import austral.ingsis.snippetops.dto.permissions.SnippetDTO
