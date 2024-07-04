@@ -27,6 +27,7 @@ stream:
   request_formater_key: formatingStream
   request_linter_result_key: lintingResultStream
   request_format_result_key: formatingResultStream
+
 groups:
   lint: lintSnippetsOnRuleChange
   format: formatSnippetsOnRuleChange

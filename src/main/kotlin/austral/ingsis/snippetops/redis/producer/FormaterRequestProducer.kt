@@ -1,5 +1,6 @@
 package austral.ingsis.snippetops.redis.producer
 
+import com.example.redisevents.FormaterRequest
 import org.austral.ingsis.redis.RedisStreamProducer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -22,10 +23,3 @@ FormatterRequestProducer
             println("published on format stream: $event")
         }
     }
-
-data class FormaterRequest(
-    val snippetId: Long,
-    val writerId: String,
-    val snippetContent: String,
-    val formatterRules: Map<String, Any>,
-)
