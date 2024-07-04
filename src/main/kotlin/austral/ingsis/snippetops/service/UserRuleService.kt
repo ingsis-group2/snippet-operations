@@ -92,6 +92,7 @@ class UserRuleService(
                     it.content,
                     lintingRules,
                 )
+            println("publishing on lint stream: $lintRequest")
             lintRequestProducer.publishLintRequest(lintRequest)
         }
     }
