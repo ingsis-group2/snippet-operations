@@ -3,9 +3,9 @@ package austral.ingsis.snippetops.service
 import austral.ingsis.snippetops.dto.permissions.SnippetDTO
 import austral.ingsis.snippetops.redis.producer.FormaterRequest
 import austral.ingsis.snippetops.redis.producer.FormatterRequestProducer
-import austral.ingsis.snippetops.redis.producer.LintRequest
 import austral.ingsis.snippetops.redis.producer.LintRequestProducer
 import austral.ingsis.snippetops.repository.BucketRepository
+import com.example.redisevents.LintRequest
 import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
