@@ -1,6 +1,12 @@
 package austral.ingsis.snippetops.service
 
+import austral.ingsis.snippetops.dto.permissions.SnippetDTO
+import austral.ingsis.snippetops.redis.producer.FormaterRequest
+import austral.ingsis.snippetops.redis.producer.FormatterRequestProducer
+import austral.ingsis.snippetops.redis.producer.LintRequestProducer
 import austral.ingsis.snippetops.repository.BucketRepository
+import com.example.redisevents.LintRequest
+import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -8,6 +14,9 @@ import org.springframework.stereotype.Service
 @Service
 class UserRuleService(
     @Autowired val bucketRepository: BucketRepository,
+    @Autowired private val snippetService: SnippetService,
+    @Autowired private val lintRequestProducer: LintRequestProducer,
+    @Autowired private val formaterRequestProducer: FormatterRequestProducer,
 ) {
     fun getUserRules(
         userId: String,
@@ -56,15 +65,14 @@ class UserRuleService(
         }
     }
 
-    private fun defaultLintingRules(): Map<String, Any> {
-        return mapOf(
+    private fun defaultLintingRules(): Map<String, Any> =
+        mapOf(
             "enablePrintExpressions" to true,
             "caseConvention" to "CAMEL_CASE",
         )
-    }
 
-    private fun defaultFormattingRules(): Map<String, Any> {
-        return mapOf(
+    private fun defaultFormattingRules(): Map<String, Any> =
+        mapOf(
             "colonBefore" to true,
             "colonAfter" to true,
             "assignationBefore" to true,
@@ -72,9 +80,57 @@ class UserRuleService(
             "printJump" to 1,
             "ifIndentation" to 1,
         )
+
+    suspend fun publishLintStream(
+        userId: String,
+        lintingRules: Map<String, Any>,
+    ) {
+        val snippets = getWriterSnippets(userId)
+        snippets.forEach {
+            val lintRequest =
+                LintRequest(
+                    it.id,
+                    it.content,
+                    lintingRules,
+                )
+            runBlocking {
+                lintRequestProducer.publishLintRequest(lintRequest)
+            }
+        }
     }
 
-    private fun sliceUserId(fullUserId: String): String {
-        return fullUserId.substringAfter("|")
+    suspend fun publishFormatStream(
+        userId: String,
+        formatRules: Map<String, Any>,
+    ) {
+        val snippets = getWriterSnippets(userId)
+        snippets.forEach {
+            val formatRequest =
+                FormaterRequest(
+                    it.id,
+                    it.user.id,
+                    it.content,
+                    formatRules,
+                )
+            runBlocking {
+                formaterRequestProducer.publishFormatRequest(formatRequest)
+            }
+        }
+    }
+
+    private fun sliceUserId(fullUserId: String): String = fullUserId.substringAfter("|")
+
+    private fun getWriterSnippets(userId: String): List<SnippetDTO> {
+        var snippetPageCounter = 0
+        var snippets = mutableListOf<SnippetDTO>()
+        while (true) {
+            val snippetPage = snippetService.getSnippetByWriter(userId, snippetPageCounter)
+            if (snippetPage.body == null || snippetPage.body!!.isEmpty()) {
+                break
+            }
+            snippets.addAll(snippetPage.body!!)
+            snippetPageCounter++
+        }
+        return snippets
     }
 }

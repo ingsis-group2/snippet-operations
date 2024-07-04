@@ -2,7 +2,7 @@ version: '3'
 
 services:
   snippet-operations:
-    container_name: "snippet-operations"
+    container_name: "snippet-operations-test"
     build:
       context: .
       dockerfile: Dockerfile
@@ -12,3 +12,11 @@ services:
       - .env
     environment:
       - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_KEY}
+    depends_on:
+      - redis
+
+  redis:
+    container_name: "redis"
+    image: redis:6-alpine
+    ports:
+        - "6379:6379"
