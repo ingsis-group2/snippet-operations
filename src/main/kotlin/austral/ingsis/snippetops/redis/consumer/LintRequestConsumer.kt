@@ -21,19 +21,19 @@ class LinterConsumer
         @Value("\${spring.data.redis.stream.request_linter_result_key}") streamKey: String,
         @Value("\${spring.data.redis.groups.lint_result}") groupId: String,
         private val snippetService: SnippetService,
-    ) : RedisStreamConsumer<LintResultEvent>(streamKey, groupId, redis) {
+    ) : RedisStreamConsumer<LintResult>(streamKey, groupId, redis) {
         init {
             subscription()
         }
 
-        override fun options(): StreamReceiver.StreamReceiverOptions<String, ObjectRecord<String, LintResultEvent>> =
+        override fun options(): StreamReceiver.StreamReceiverOptions<String, ObjectRecord<String, LintResult>> =
             StreamReceiver.StreamReceiverOptions
                 .builder()
                 .pollTimeout(Duration.ofMillis(10000)) // Set poll rate
-                .targetType(LintResultEvent::class.java) // Set type to de-serialize record
+                .targetType(LintResult::class.java) // Set type to de-serialize record
                 .build()
 
-        override fun onMessage(record: ObjectRecord<String, LintResultEvent>) {
+        override fun onMessage(record: ObjectRecord<String, LintResult>) {
             println("------------------------------------------------------")
             println("message received on linter result stream: ${record.value}")
             println("snippet id: ${record.value.snippetId}")
@@ -53,7 +53,7 @@ class LinterConsumer
         }
     }
 
-data class LintResultEvent(
+data class LintResult(
     val snippetId: Long,
     val reportList: List<String>,
     val errorList: List<String>,
