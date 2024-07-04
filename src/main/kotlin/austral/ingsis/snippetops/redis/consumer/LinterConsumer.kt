@@ -37,12 +37,11 @@ class LinterConsumer
         override fun onMessage(record: ObjectRecord<String, LintResult>) {
             println("------------------------------------------------------")
             println("message received on linter result stream: ${record.value}")
-            println("snippet id: ${record.value.snippetId}")
-            println("report list: ${record.value.reportList}")
-            println("error list: ${record.value.errorList}")
+            val reportList = record.value.reportList ?: emptyList()
+            val errorList = record.value.errorList ?: emptyList()
             val response =
                 snippetService.updateSnippetLintStatus(
-                    UpdateLintStatusDTO(record.value.snippetId, record.value.reportList, record.value.errorList),
+                    UpdateLintStatusDTO(record.value.snippetId, reportList, errorList),
                 )
             if (response.statusCode.is2xxSuccessful) {
                 println("Snippet lint status updated successfully")

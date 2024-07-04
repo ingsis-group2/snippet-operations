@@ -1,6 +1,7 @@
 package austral.ingsis.snippetops.redis.consumer
 
 import austral.ingsis.snippetops.service.SnippetService
+import com.example.redisevents.FormatResult
 import org.austral.ingsis.redis.RedisStreamConsumer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -55,9 +56,3 @@ class FormaterRequestConsumer
             }
         }
     }
-
-data class FormatResult(
-    val snippetId: Long,
-    val userId: String,
-    val formattedSnippet: String,
-)
